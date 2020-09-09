@@ -20,9 +20,10 @@ The results are printed to a CSV file. The columns are:
 * gft_ratio  = mean_auction_gft / mean_optimal_gft * 100%.
               Theoretically it should be at least 1 - 1/k.
               In the results, it is usually higher.
+* stock_names = list of stock names that the experiment run on them.
 
-Since:  2019-11
-Author: Erel Segal-Halevi
+Author: Dvir Gilor
+Since:  2020-08
 
 """
 

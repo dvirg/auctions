@@ -3,8 +3,8 @@
 """
 Perform a simulation experiment with the ascending auction, similar to the one described by McAfee (1992), Table I (page 448).
 
-Since:  2019-11
-Author: Erel Segal-Halevi
+Author: Dvir Gilor
+Since:  2020-08
 """
 
 from experiment_stock import  experiment

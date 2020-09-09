@@ -4,8 +4,8 @@
 Demonstration of a multiple-clock strongly-budget-balanced ascending auction
 for a multi-lateral market with one buyer per two sellers (recipe: 1,2)
 
-Author: Erel Segal-Halevi
-Since:  2019-08
+Author: Dvir Gilor
+Since:  2020-08
 """
 
 from markets import Market

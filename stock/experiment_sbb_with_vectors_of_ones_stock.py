@@ -4,8 +4,8 @@
 Simulation experiment for our AAAI 2020 paper, with recipes that are vectors of ones.
 Comparing McAfee's double auction to our SBB auctions.
 
-Since:  2019-11
-Author: Erel Segal-Halevi
+Author: Dvir Gilor
+Since:  2020-08
 
 """
 
