@@ -113,7 +113,7 @@ class Market:
             categories[i] = AgentCategory(self.categories[i].name, [])
         return categories
 
-    def optimal_trade(self, ps_recipe:list, max_iterations:int=2000)->tuple:
+    def optimal_trade(self, ps_recipe:list, max_iterations:int=1000000)->tuple:
         """
         :param ps_recipe: a list that indicates the number of agents from each category that should be in each PS.
         For example: [1,2] means 1 agent from first category (e.g. one buyer) and 2 agents from second category (e.g. two sellers).

@@ -1,7 +1,7 @@
-auction_name,recipe,num_of_agents,mean_optimal_count,mean_auction_count,count_ratio,mean_optimal_gft,mean_auction_gft,gft_ratio
-SBB Ascending Prices,1:1,100,49.96,49.32,98.71,25074.21,24913.53,99.36
-SBB Ascending Prices,1:1,1000,499.26,498.78,99.9,249367.39,249246.13,99.95
-SBB Ascending Prices,1:1:1,100,49.32,48.8,98.94,49262.09,49052.96,99.58
-SBB Ascending Prices,1:1:1,1000,500.24,499.76,99.9,500885.77,500692.97,99.96
-SBB Ascending Prices,2:1,100,49.22,48.7,98.94,24621.81,24427.52,99.21
-SBB Ascending Prices,2:1,1000,499.56,498.98,99.88,249462.43,249260.76,99.92
+iterations,auction_name,recipe,num_of_agents,mean_optimal_count,mean_auction_count,count_ratio,mean_optimal_gft,mean_auction_total_gft,total_gft_ratio,mean_auction_market_gft,market_gft_ratio
+50,SBB Ascending Prices,1:1,100,49.76,49.28,99.03,24293.01,24178.71,99.53,24178.71,99.53
+50,SBB Ascending Prices,1:1,1000,500.32,499.9,99.91,250251.89,250147.47,99.96,250147.47,99.96
+50,SBB Ascending Prices,1:1:1,100,49.8,49.38,99.15,49633.73,49485.55,99.7,49485.55,99.7
+50,SBB Ascending Prices,1:1:1,1000,499.74,499.3,99.91,497824.11,497646.7,99.96,497646.7,99.96
+50,SBB Ascending Prices,2:1,100,50.32,49.8,98.96,24893.68,24718.98,99.3,24718.98,99.3
+50,SBB Ascending Prices,2:1,1000,500.9,500.24,99.86,250731.82,250486.58,99.9,250486.58,99.9
