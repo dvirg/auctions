@@ -1,0 +1,3 @@
+iterations,auction_name,recipe,num_of_agents,mean_optimal_count,mean_auction_count,count_ratio,mean_optimal_gft,mean_auction_total_gft,total_gft_ratio,mean_auction_market_gft,market_gft_ratio
+1,SBB Ascending Prices,1:1,5,0.0,4.0,0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices,1:1,5,0.0,4.0,0,0.0,0.0,0,0.0,0
