@@ -27,7 +27,7 @@ market = Market([
 print(budget_balanced_ascending_auction(market, [1,1]))
 
 
-print("\n\n###### RUNNING EXPERIMEENT FOR DEMO OF TYPE (1,1)")
+print("\n\n###### RUNNING EXPERIMENT FOR DEMO OF TYPE (1,1)")
 
 results_file = "results/ascending_auction_demo_11.csv"
 SBB_ASCENDING_STOCKS = "SBB Ascending Prices"
