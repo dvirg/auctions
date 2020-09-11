@@ -64,6 +64,8 @@ def experiment(results_csv_file:str, auction_function:Callable, auction_name:str
 
             sum_optimal_count += optimal_trade.num_of_deals()
             sum_auction_count += auction_trade.num_of_deals()
+            if(auction_trade.num_of_deals() > optimal_trade.num_of_deals()):
+                print(auction_trade.num_of_deals() / optimal_trade.num_of_deals())
 
             sum_optimal_gft += optimal_trade.gain_from_trade()
             sum_auction_total_gft += auction_trade.gain_from_trade(including_auctioneer=True)

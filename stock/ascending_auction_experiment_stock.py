@@ -13,16 +13,17 @@ from ascending_auction_protocol import budget_balanced_ascending_auction
 import sys
 
 results_file = "results/ascending_auction_stock.csv"
+SBB_ASCENDING_STOCKS = "SBB Ascending Prices with Stocks"
 
-experiment(results_file,budget_balanced_ascending_auction, "SBB Ascending Prices", (1, 1))
+experiment(results_file,budget_balanced_ascending_auction, SBB_ASCENDING_STOCKS, (1, 1))
 
-experiment(results_file,budget_balanced_ascending_auction, "SBB Ascending Prices", (1, 1, 1))
+experiment(results_file,budget_balanced_ascending_auction, SBB_ASCENDING_STOCKS, (1, 1, 1))
 
-experiment(results_file,budget_balanced_ascending_auction, "SBB Ascending Prices", (1, 1, 1, 1))
+experiment(results_file,budget_balanced_ascending_auction, SBB_ASCENDING_STOCKS, (1, 1, 1, 1))
 
-experiment(results_file,budget_balanced_ascending_auction, "SBB Ascending Prices", (2, 1))
+experiment(results_file,budget_balanced_ascending_auction, SBB_ASCENDING_STOCKS, (2, 1))
 
-experiment(results_file,budget_balanced_ascending_auction, "SBB Ascending Prices", (1, 2))
+experiment(results_file,budget_balanced_ascending_auction, SBB_ASCENDING_STOCKS, (1, 2))
 
-experiment(results_file,budget_balanced_ascending_auction, "SBB Ascending Prices", (2, 1, 1))
+experiment(results_file,budget_balanced_ascending_auction, SBB_ASCENDING_STOCKS, (2, 1, 1))
 

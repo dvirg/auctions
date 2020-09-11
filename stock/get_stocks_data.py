@@ -2,6 +2,7 @@
 
 """
 Imports stock prices from csv files downloaded from Yahoo.
+The CSV files are stored in stocks directory.
 
 Author: Dvir Gilor
 Since:  2020-08
