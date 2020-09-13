@@ -1,3 +1,123 @@
 iterations,auction_name,recipe,num_of_agents,mean_optimal_count,mean_auction_count,count_ratio,mean_optimal_gft,mean_auction_total_gft,total_gft_ratio,mean_auction_market_gft,market_gft_ratio
-1,SBB Ascending Prices,1:1,5,0.0,4.0,0,0.0,0.0,0,0.0,0
-1,SBB Ascending Prices,1:1,5,0.0,4.0,0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,2.0,2.0,100.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,4.0,3.0,75.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,2.0,2.0,100.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,3.0,3.0,100.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,3.0,2.0,66.66,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,2.0,2.0,100.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,1.0,1.0,100.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,1.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,3.0,2.0,66.66,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,3.0,2.0,66.66,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,4.0,3.0,75.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,2.0,2.0,100.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,3.0,3.0,100.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,2.0,2.0,100.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,50,21.0,20.0,95.23,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,50,26.0,25.0,96.15,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,1.0,1.0,100.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,1.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,2.0,2.0,100.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,3.0,2.0,66.66,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,50,24.0,23.0,95.83,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,50,23.0,22.0,95.65,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,3.0,2.0,66.66,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,3.0,3.0,100.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,1.0,1.0,100.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,1.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,4.0,3.0,75.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,50,24.0,24.0,100.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,50,27.0,26.0,96.29,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,2.0,1.0,50.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,3.0,3.0,100.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,2.0,2.0,100.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,2.0,2.0,100.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,3.0,2.0,66.66,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,50,21.0,20.0,95.23,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,50,23.0,22.0,95.65,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,4.0,3.0,75.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,3.0,2.0,66.66,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB External Competition Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,SBB Ascending Prices Stock,1:1,5,0.0,4.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
+1,McAfee Without Heuristic Stock,1:1,5,0.0,0.0,0.0,0.0,0.0,0,0.0,0
