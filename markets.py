@@ -113,10 +113,11 @@ class Market:
             categories[i] = AgentCategory(self.categories[i].name, [])
         return categories
 
-    def optimal_trade(self, ps_recipe:list, max_iterations:int=1000000)->tuple:
+    def optimal_trade(self, ps_recipe:list, max_iterations:int=2000, include_zero_gft_ps:bool=True)->tuple:
         """
         :param ps_recipe: a list that indicates the number of agents from each category that should be in each PS.
         For example: [1,2] means 1 agent from first category (e.g. one buyer) and 2 agents from second category (e.g. two sellers).
+        :param include_zero_gft_ps: whether or not to include in the optimal trade procurement-sets with GFT = 0.
 
         :return: a list of procurement-sets, and a remaining market.
         Each PS should contain a single agent from each category.
@@ -163,11 +164,14 @@ class Market:
         remaining_market = self.clone()
         for iteration in range(max_iterations):
             ps = remaining_market.get_highest_agents(ps_recipe)
-            if ps is None or sum(ps) <= 0:
+            if ps is None:
                 break      # Either there are not enough traders in one of the categories, or the GFT is negative, so we cannot create any more positive procurement-sets.
-            else:          # sum(ps) > 0 --- the GFT is positive:
-                trade.append(tuple(ps))
-                remaining_market.remove_highest_agents(ps_recipe)
+            gft = sum(ps)
+            if gft < 0 or (gft == 0 and not include_zero_gft_ps):
+                break
+
+            trade.append(tuple(ps))
+            remaining_market.remove_highest_agents(ps_recipe)
         trade.sort(key=lambda ps: sum(ps)) # sort in increasing order of GFT
         return (TradeWithMaterialBalance(trade), remaining_market)
 

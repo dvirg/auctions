@@ -65,11 +65,6 @@ def experiment(results_csv_file:str, auction_function:Callable, auction_name:str
             sum_optimal_count += optimal_trade.num_of_deals()
             sum_auction_count += auction_trade.num_of_deals()
 
-        if(auction_trade.num_of_deals() > optimal_trade.num_of_deals()):
-            print("Warning!!! the number of deals in action is greater than optimal!")
-            print("     Optimal num of deals: ", optimal_trade.num_of_deals())
-            print("     Auction num of deals: ", auction_trade.num_of_deals())
-
             sum_optimal_gft += optimal_trade.gain_from_trade()
             sum_auction_total_gft += auction_trade.gain_from_trade(including_auctioneer=True)
             sum_auction_market_gft += auction_trade.gain_from_trade(including_auctioneer=False)
