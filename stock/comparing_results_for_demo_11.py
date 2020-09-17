@@ -28,6 +28,12 @@ market = Market([
 ])
 print(budget_balanced_ascending_auction(market, [1,1]))
 
+market = Market([
+    AgentCategory("buyer", [1,1,1,1,1]),
+    AgentCategory("seller", [-1,-1,-1,-1,-0.5]),
+])
+print(mcafee_trade_reduction(market, [1,1]))
+
 
 print("\n\n###### RUNNING EXPERIMENT FOR DEMO OF TYPE (1,1)")
 
@@ -38,22 +44,21 @@ results_file = "results/ascending_auction_demo_11.csv"
 SBB_ASCENDING_STOCKS = "SBB Ascending Prices"
 
 experiment(results_file,mcafee_trade_reduction, "McAfee Stock", (1, 1),
-           value_ranges   = [(1,1),(-1,-1)],
-           nums_of_agents = (5,5),
+           value_ranges   = [(1,2),(-1,-2)],
+           nums_of_agents = (50,50),
            num_of_iterations = 1
            )
 
 
-experiment(results_file,budget_balanced_trade_reduction, "SBB External Competition Stock", (1, 1),
-           value_ranges   = [(1,1),(-1,-1)],
-           nums_of_agents = (5,5),
+experiment(results_file,budget_balanced_trade_reduction, "SBB External Competition", (1, 1),
+           value_ranges   = [(1,2),(-1,-2)],
+           nums_of_agents = (50,50),
            num_of_iterations = 1
            )
 
-
-experiment(results_file,budget_balanced_ascending_auction, "SBB Ascending Prices Stock", (1, 1),
-           value_ranges   = [(1,1),(-1,-1)],
-           nums_of_agents = (5,5),
+experiment(results_file,budget_balanced_ascending_auction, "SBB Ascending Prices", (1, 1),
+           value_ranges   = [(1,2),(-1,-2)],
+           nums_of_agents = (50,50),
            num_of_iterations = 1
            )
 
@@ -61,9 +66,9 @@ experiment(results_file,budget_balanced_ascending_auction, "SBB Ascending Prices
 from functools import partial
 mcafee_without_heuristic = partial(mcafee_trade_reduction,price_heuristic=False)
 
-experiment(results_file,mcafee_without_heuristic, "McAfee Without Heuristic Stock", (1, 1),
-           value_ranges   = [(1,1),(-1,-1)],
-           nums_of_agents = (5,5),
+experiment(results_file,mcafee_without_heuristic, "McAfee Without Heuristic", (1, 1),
+           value_ranges   = [(1,2),(-1,-2)],
+           nums_of_agents = (50,50),
            num_of_iterations = 1
            )
 

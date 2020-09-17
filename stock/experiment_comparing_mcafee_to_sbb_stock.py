@@ -15,7 +15,7 @@ from experiment import experiment
 from mcafee_protocol import mcafee_trade_reduction
 from trade_reduction_protocol import budget_balanced_trade_reduction
 from ascending_auction_protocol import budget_balanced_ascending_auction
-from experiment_iteration_stock import experiment
+from experiment_compare_iterations_autions import experiment
 
 from functools import partial
 mcafee_without_heuristic = partial(mcafee_trade_reduction,price_heuristic=False)
