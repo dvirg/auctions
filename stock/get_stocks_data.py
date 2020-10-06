@@ -25,8 +25,25 @@ def getPrices(stockFile:str, recipe:tuple):
         data = [data[0] + data[1], [*data[2], *data[3]]]
     elif recipe == (2, 1, 1):
         data = [[*data[0], *data[1]], data[2], data[3]]
-    elif len(recipe) == 3:
+    elif recipe == (1, 1, 1):
         data = [data[0] + data[1], data[2], data[3]]
+    elif len(recipe) == 3 and recipe[1:] == recipe[:-1]:
+        data = [data[0] + data[1], data[2], data[3]]
+    else: # recipe[1:] == recipe[:-1]: #all numbers in recipe are identical
+        buyers = [*data[0], *data[1]]
+        sellers = [*data[2], *data[3]]
+        size = len(recipe)
+        sum_sellers = sum(recipe) - recipe[0]
+        multiple = 1
+        for v in recipe:
+            multiple *= v
+        split_data = [[] for i in range(size)]
+        print(split_data)
+        split_data[0] += [buyer for buyer in buyers for _ in range(recipe[0])]
+        for i in range(len(sellers)*(len(recipe)-1)):
+            split_data[(i % (size-1))+1] += [sellers[i % len(sellers)]/sum_sellers for _ in range(recipe[(i % (size-1))+1])]
+        data = split_data
+    print([len(category) for category in data])
     return data
 
 def getStocksPrices(recipe:tuple):

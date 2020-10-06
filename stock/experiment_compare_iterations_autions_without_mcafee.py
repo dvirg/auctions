@@ -18,20 +18,16 @@ The results are printed to a CSV file. The columns are:
                        Note that k <= n. E.g., there may be 100 buyers and 100 sellers, but only 50 procurement-sets with positive GFT, so k=50.
 * optimal_gft - OPT = gain-from-trade in the optimal trade,
 * optimal_trade_with_gft_zero - OPT = gain-from-trade in the optimal trade, including sets with GFT=0
-* count = k' = number of deals done by our auction,  averaged over all iterations.
+* auction_count = k' = number of deals done by our auction,  averaged over all iterations.
                        Theoretically, since at most one deal is removed, it should be  either k or k-1.
-* count_ratio = %k' = count / optimal_count  * 100%.
-* total_gft = GFT = gain-from-trade in the auction, including auctioneer
-* total_gft_ratio = %GFT = total_gft / optimal_gft * 100%.
-              Theoretically it should be at least 1 - 1/k.
-              In the results, it is usually higher.
-* market_gft = Market GFT = gain-from-trade in the auction, not including auctioneer.
-* market_gft_ratio = Market %GFT = market_gft / optimal_gft * 100%.
+* count_ratio = %k' = auction_count / optimal_count  * 100%.
+* gft = GFT = gain-from-trade in the auction, including auctioneer
+* gft_ratio = %GFT = gft / optimal_gft * 100%.
               Theoretically it should be at least 1 - 1/k.
               In the results, it is usually higher.
 
 Recommended: add manually at the beginning of the file the header line:
-,recipe,n,k,k+0,OPT_GFT,OPT_GFT+0,McAfee_k',%k',total_gft,%total_gft,market_gft,market_%gft,McAfee_Without_Heuristic_k',%k',total_gft,%total_gft,market_gft,market_%gft,SBB_External_Competition_k',%k',gft,%gft,market_gft,market_%gft,SBB_Ascending_Prices_k,%k',gft,%gft,market_gft,market_%gft
+,recipe,n,k,k+0,OPT_GFT,SBB_External_Competition_k',%k',gft,%gft,SBB_Ascending_Prices_k,%k',gft,%gft
 
 Author: Dvir Gilor
 Since:  2020-08
@@ -47,9 +43,8 @@ from collections import OrderedDict
 from get_stocks_data import getStocksPrices
 
 TABLE_COLUMNS = ["stock_name", "recipe", "num_possible_trades", "optimal_count", "optimal_count_with_gft_zero",
-                 "optimal_gft", "optimal_gft_with_gft_zero"]
-AUCTION_COLUMNS = ["count", "count_ratio", "total_gft", "total_gft_ratio",
-                   "market_gft", "market_gft_ratio"]
+                 "optimal_gft"]
+AUCTION_COLUMNS = ["auction_count", "count_ratio", "gft", "gft_ratio"]
 
 def experiment(results_csv_file:str, auction_functions:list, auction_names:str, recipe:tuple,
                nums_of_agents=None, stocks_prices:list=None, stock_names:list=None):
@@ -62,6 +57,7 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
     :param stocks_prices: list of prices for each stock and each agent.
     :param stock_names: list of stocks names which prices are belongs, for naming only.
     """
+    print(recipe)
     if stocks_prices is None:
         (stocks_prices, stock_names) = getStocksPrices(recipe)
     column_names = TABLE_COLUMNS
@@ -70,11 +66,11 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
     recipe_str = ":".join(map(str,recipe))
     if nums_of_agents is None:
         nums_of_agents = [10000000]
+
     for i in range(len(stocks_prices)):
         last_iteration = False
         for num_of_agents_per_category in nums_of_agents:
-            num_of_possible_ps = min(num_of_agents_per_category,
-                                     min([len(stocks_prices[i][j])/recipe[j] for j in range(len(stocks_prices[i]))]))
+            num_of_possible_ps = min(num_of_agents_per_category,len(stocks_prices[i][0]))
             if last_iteration is True and num_of_possible_ps < num_of_agents_per_category:
                 break
             if num_of_possible_ps < num_of_agents_per_category:
@@ -90,41 +86,31 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
             optimal_gft = optimal_trade.gain_from_trade()
             (optimal_trade_with_gft_zero, _) = market.optimal_trade(ps_recipe=recipe, max_iterations=10000000)
             optimal_count_with_gft_zero = optimal_trade_with_gft_zero.num_of_deals()
-            optimal_gft_with_gft_zero = optimal_trade_with_gft_zero.gain_from_trade()
 
             results = [("stock_name", stock_names[i]), ("recipe", recipe_str),
                        ("num_possible_trades", round(num_of_possible_ps)), ("optimal_count", round(optimal_count,2)),
                        ("optimal_count_with_gft_zero", round(optimal_count_with_gft_zero,2)),
-                       ("optimal_gft", round(optimal_gft,2)),
-                       ("optimal_gft_with_gft_zero", round(optimal_gft_with_gft_zero,2))]
+                       ("optimal_gft", round(optimal_gft,2))]
             for auction_index in range(len(auction_functions)):
                 auction_trade = auction_functions[auction_index](market, recipe)
-                count = auction_trade.num_of_deals()
+                auction_count = auction_trade.num_of_deals()
                 if(auction_names[auction_index] == "SBB_External_Competition" and auction_trade.num_of_deals() > optimal_trade.num_of_deals()):
                     print("Warning!!! the number of deals in action is greater than optimal!")
                     print("Optimal num of deals: ", optimal_trade.num_of_deals())
                     print("Auction num of deals: ", auction_trade.num_of_deals())
                     print("Auction name: ", auction_names[auction_index])
-                total_gft = auction_trade.gain_from_trade(including_auctioneer=True)
-                market_gft = auction_trade.gain_from_trade(including_auctioneer=False)
+                gft = auction_trade.gain_from_trade(including_auctioneer=False)
                 auction_name = auction_names[auction_index]
-                results.append((auction_name + "_count", round(auction_trade.num_of_deals(),2)))
+                results.append((auction_name + "_auction_count", round(auction_trade.num_of_deals(),2)))
                 if auction_names[auction_index] != "SBB_External_Competition":
                     results.append((auction_name + "_count_ratio",
-                                    0 if optimal_count==0 else int((count / optimal_count_with_gft_zero) * 100000)/1000))
-                    results.append((auction_name + "_total_gft", round(total_gft,2)))
-                    results.append((auction_name + "_total_gft_ratio", 0 if optimal_gft==0 else round(total_gft / optimal_gft_with_gft_zero*100,3)))
-                    results.append((auction_name + "_market_gft", round(market_gft, 2)))
-                    results.append((auction_name + "_market_gft_ratio",
-                                    0 if optimal_gft == 0 else round(market_gft / optimal_gft_with_gft_zero * 100, 3)))
+                                    0 if optimal_count==0 else int((auction_count / optimal_count_with_gft_zero) * 100000)/1000))
+                    results.append((auction_name + "_gft", round(gft,2)))
                 else:
                     results.append((auction_name + "_count_ratio",
-                                    0 if optimal_count==0 else int((count / optimal_count) * 100000)/1000))
-                    results.append((auction_name + "_total_gft", round(total_gft,2)))
-                    results.append((auction_name + "_total_gft_ratio", 0 if optimal_gft==0 else round(total_gft / optimal_gft*100,3)))
-                    results.append((auction_name + "_market_gft", round(market_gft, 2)))
-                    results.append((auction_name + "_market_gft_ratio",
-                                    0 if optimal_gft == 0 else round(market_gft / optimal_gft * 100, 3)))
+                                    0 if optimal_count==0 else int((auction_count / optimal_count) * 100000)/1000))
+                    results.append((auction_name + "_gft", round(gft,2)))
+                results.append((auction_name + "_gft_ratio", 0 if optimal_gft==0 else round(gft / optimal_gft*100,3)))
 
             results_table.add(OrderedDict(results))
     results_table.done()
