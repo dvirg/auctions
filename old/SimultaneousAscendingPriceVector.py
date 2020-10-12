@@ -114,6 +114,8 @@ class SimultaneousAscendingPriceVectors:
             (category_index, new_price, _) = increases[vector_index]
             new_sums[vector_index] = vector.price_sum_after_increase(category_index, new_price)
         min_new_sum = min(0, min(new_sums))
+        if -0.00000000001 < min_new_sum and min_new_sum < 0.00000000001:
+            min_new_sum = 0
         logger.info("  Price-sums after increase: %s.  Min sum: %f", new_sums, min_new_sum)
 
         for vector_index, vector in enumerate(self.vectors):

@@ -17,6 +17,7 @@ from prices import AscendingPriceVector, PriceStatus
 import math, logging, sys
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler(sys.stdout))
+# logger.setLevel(logging.INFO)
 # To enable tracing, set logger.setLevel(logging.INFO)
 
 

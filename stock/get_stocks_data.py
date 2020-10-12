@@ -39,11 +39,19 @@ def getPrices(stockFile:str, recipe:tuple):
             multiple *= v
         split_data = [[] for i in range(size)]
         print(split_data)
-        split_data[0] += [buyer for buyer in buyers for _ in range(recipe[0])]
+        split_data[0] += [buyer*sum_sellers for buyer in buyers for _ in range(recipe[0])]
         for i in range(len(sellers)*(len(recipe)-1)):
-            split_data[(i % (size-1))+1] += [sellers[i % len(sellers)]/sum_sellers for _ in range(recipe[(i % (size-1))+1])]
+            split_data[(i % (size-1))+1] += [sellers[i % len(sellers)] for _ in range(recipe[(i % (size-1))+1])]
         data = split_data
     print([len(category) for category in data])
+    for i in range(len(data)):
+        for j in range(len(data[i])):
+            if data[i][j] <= 0.0001 and i == 0:
+                data[i][j] = 0.0001
+            elif data[i][j] >= -0.0001 and i > 0:
+                data[i][j] = -0.0001
+            else:
+                data[i][j] = (int(data[i][j]*10000))/10000
     return data
 
 def getStocksPrices(recipe:tuple):

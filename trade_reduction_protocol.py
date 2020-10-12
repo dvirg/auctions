@@ -16,9 +16,19 @@ from trade import TradeWithSinglePrice
 import logging, sys
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler(sys.stdout))
+# logger.setLevel(logging.INFO)
 # To enable tracing, set logger.setLevel(logging.INFO)
 
 MAX_VALUE=1000000    # an upper bound (not necessarily tight) on the agents' values.
+
+
+def convert_category_index(ps_recipe:list, pivot_index:int):
+    for i in range(len(ps_recipe)):
+        if pivot_index < ps_recipe[i]:
+            return i
+        else:
+            pivot_index -= ps_recipe[i]
+    return len(ps_recipe)-1
 
 
 def budget_balanced_trade_reduction(market:Market, ps_recipe:list):
@@ -29,6 +39,26 @@ def budget_balanced_trade_reduction(market:Market, ps_recipe:list):
                        Each integer i represents the number of agents of category i
                        that should be in each procurement-set.
     :return: Trade object, representing the trade and prices.
+
+    >>> # Multi trade
+    >>> market = Market([AgentCategory("buyer", [17, 14, 13, 9, 6]),AgentCategory("seller", [-1, -2, -3, -4, -5, -7, -8, -10, -11])])
+    >>> print(market); print(budget_balanced_trade_reduction(market, [1, 2]))
+    Traders: [buyer: [17, 14, 13, 9, 6], seller: [-1, -2, -3, -4, -5, -7, -8, -10, -11]]
+    buyer: [17, 14]: all 2 agents trade and pay 13
+    seller: [-1, -2, -3, -4, -5]: random 4 out of 5 agents trade and pay -6.5
+
+    >>> market = Market([AgentCategory("buyer", [17, 16, 15, 14, 13, 12, 10, 6]),AgentCategory("mediator", [-3, -4, -5, -6, -7, -8, -9, -10]),AgentCategory("seller", [-1, -2, -3, -4, -5, -6, -7, -8])])
+    >>> print(market); print(budget_balanced_trade_reduction(market, [2,2,3]))
+    Traders: [buyer: [17, 16, 15, 14, 13, 12, 10, 6], mediator: [-3, -4, -5, -6, -7, -8, -9, -10], seller: [-1, -2, -3, -4, -5, -6, -7, -8]]
+    buyer: [17, 16]: all 2 agents trade and pay 15
+    mediator: [-3, -4]: all 2 agents trade and pay -5
+    seller: [-1, -2, -3, -4, -5, -6]: random 3 out of 6 agents trade and pay -6.666666666666667
+
+    >>> market = Market([AgentCategory("buyer", [20, 18, 16, 9, 2, 1]),AgentCategory("seller", [-2, -4, -6, -8, -10, -12, -14])])
+    >>> print(market); print(budget_balanced_trade_reduction(market, [3,2]))
+    Traders: [buyer: [20, 18, 16, 9, 2, 1], seller: [-2, -4, -6, -8, -10, -12, -14]]
+    buyer: [20, 18, 16, 9]: random 3 out of 4 agents trade and pay 6.666666666666667
+    seller: [-2, -4, -6, -8]: random 2 out of 4 agents trade and pay -10
 
     >>> # ONE BUYER, ONE SELLER
     >>> market = Market([AgentCategory("buyer", [9.]),  AgentCategory("seller", [-4.])])
@@ -132,55 +162,61 @@ def budget_balanced_trade_reduction(market:Market, ps_recipe:list):
             "There are {} categories but {} elements in the PS recipe".
                 format(market.num_categories, len(ps_recipe)))
 
-    if any(r!=1 for r in ps_recipe):
-        raise ValueError("Currently, the trade-reduction protocol supports only recipes of ones; {} was given".format(ps_recipe))
-
     logger.info("\n#### Budget-Balanced Trade Reduction\n")
     logger.info(market)
-    (optimal_trade, remaining_market) = market.optimal_trade(ps_recipe)
+    (optimal_trade, remaining_market) = market.optimal_trade(ps_recipe, add_lowest_negative_set=True)
     for category in remaining_market.categories:
         if len(category)==0:
             category.append(-MAX_VALUE)
-    logger.info("Optimal trade, by increasing GFT: {}".format(optimal_trade))
+    logger.info("Optimal trade including one highest non-positive trade, by increasing GFT: {}".format(optimal_trade))
     logger.info("Remaining market: {}".format(remaining_market))
 
     actual_traders = market.empty_agent_categories()
+
+    # Preparing the order of pivot index for trade_reduction
+    pivot_indexes = []
+    total = 0
+    for agent in ps_recipe:
+        pivot_indexes += [total+i for i in range(agent-1, -1, -1)]
+        total += agent
 
     latest_prices = None
     for ps in optimal_trade.procurement_sets:
         ps = list(ps)
         if latest_prices is None:
             logger.info("\nCalculating prices for PS {}:".format(ps))
-            for pivot_index in range(len(ps)):
+            for pivot_index in pivot_indexes:
                 pivot_value = ps[pivot_index]
-                pivot_category = market.categories[pivot_index]
+                pivot_category_index = convert_category_index(ps_recipe, pivot_index)
+                pivot_category = market.categories[pivot_category_index]
                 logger.info("  Looking for external competition to {} with value {}:".
                       format(pivot_category.name, pivot_value))
-                best_containing_PS = remaining_market.best_containing_PS(pivot_index, pivot_value)
-                best_containing_GFT = sum(best_containing_PS)
-                if best_containing_GFT > 0:  # EXTERNAL COMPETITION - KEEP TRADER
-                    logger.info("    best PS is {} with GFT {}. It is positive so it is an external competition.".
-                          format(best_containing_PS, best_containing_GFT))
-                    prices = market.calculate_prices_by_external_competition(pivot_index, pivot_value, best_containing_PS)
+                best_containing_PS = remaining_market.best_containing_PS(pivot_category_index, pivot_value)
+                best_containing_GFT = sum([best_containing_PS[i]*ps_recipe[i] for i in range(len(best_containing_PS))])
+                if -0.0000000000001 < best_containing_GFT and best_containing_GFT < 0.0000000000001:
+                    best_containing_GFT = 0
+                if best_containing_GFT >= 0:  # EXTERNAL COMPETITION - KEEP TRADER
+                    logger.info("    best PS is {},{} with GFT {}. It is positive so it is an external competition.".
+                          format(best_containing_PS, ps_recipe, best_containing_GFT))
+                    prices = market.calculate_prices_by_external_competition(pivot_category_index, pivot_value, best_containing_PS, ps_recipe)
                     logger.info("    Prices are {}".format(prices))
                     latest_prices = prices
-                    for i in range(market.num_categories):
-                        if ps[i] is not None:
-                            actual_traders[i].append(ps[i])
+                    for i in range(len(prices)):
+                        agent_prices = market.categories[i].values
+                        for value in agent_prices:
+                            if value > prices[i]:
+                                actual_traders[i].append(value)
                     break  # done with current PS - move to next PS
                 else:  # NO EXTERNAL COMPETITION - REMOVE TRADER
-                    logger.info("    Best PS is {} with GFT {}. It is negative so it is not an external competition.".
-                          format(best_containing_PS, best_containing_GFT))
+                    logger.info("    Best PS is {},{} with GFT {}. It is negative so it is not an external competition.".
+                          format(best_containing_PS, ps_recipe, best_containing_GFT))
                     logger.info("    Remove {} {} from trade and add to remaining market".
                           format(pivot_category.name, pivot_value))
                     ps[pivot_index] = None
-                    remaining_market.append_trader(pivot_index, pivot_value)
+                    remaining_market.append_trader(pivot_category_index, pivot_value)
                     logger.info("    Remaining market is now: {}".format(remaining_market))
         else:
             logger.info("\nPrices for PS {} are {}".format(ps, latest_prices))
-            for i in range(market.num_categories):
-                if ps[i] is not None:
-                    actual_traders[i].append(ps[i])
 
     logger.info("\n")
     return TradeWithSinglePrice(actual_traders, ps_recipe, latest_prices)

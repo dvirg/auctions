@@ -113,7 +113,7 @@ class Market:
             categories[i] = AgentCategory(self.categories[i].name, [])
         return categories
 
-    def optimal_trade(self, ps_recipe:list, max_iterations:int=2000000, include_zero_gft_ps:bool=True)->tuple:
+    def optimal_trade(self, ps_recipe:list, max_iterations:int=2000000, include_zero_gft_ps:bool=True, add_lowest_negative_set:bool=False)->tuple:
         """
         :param ps_recipe: a list that indicates the number of agents from each category that should be in each PS.
         For example: [1,2] means 1 agent from first category (e.g. one buyer) and 2 agents from second category (e.g. two sellers).
@@ -167,7 +167,11 @@ class Market:
             if ps is None:
                 break      # Either there are not enough traders in one of the categories, or the GFT is negative, so we cannot create any more positive procurement-sets.
             gft = sum(ps)
-            if gft < 0 or (gft == 0 and not include_zero_gft_ps):
+            if -0.00000000001 < gft and gft < 0.00000000001:
+                gft = 0
+            if gft <= 0 and add_lowest_negative_set:
+                add_lowest_negative_set = False
+            elif gft < 0 or (gft == 0 and not include_zero_gft_ps):
                 break
 
             trade.append(tuple(ps))
@@ -200,7 +204,7 @@ class Market:
         return tuple(best_PS)
 
 
-    def calculate_prices_by_external_competition(self, pivot_index:int, pivot_value:float, best_containing_PS:list)->list:
+    def calculate_prices_by_external_competition(self, pivot_index:int, pivot_value:float, best_containing_PS:list, ps_recipe:list)->list:
         """
         Determine the prices for the given procurement-set, based on the external competition found.
         :param ps: a procurement-set - contains one agent from each category.
@@ -209,8 +213,11 @@ class Market:
         """
         prices = [None]*self.num_categories
         for category_index in range(self.num_categories):
-            if category_index==pivot_index:
-                prices[category_index] = pivot_value - sum(best_containing_PS)
+            if category_index == pivot_index:
+                prices[category_index] = (pivot_value*ps_recipe[category_index] -
+                                         sum([best_containing_PS[i]*ps_recipe[i]
+                                              for i in range(len(best_containing_PS))]))\
+                                         / ps_recipe[category_index]
             else:
                 prices[category_index] = best_containing_PS[category_index]
         prices = tuple(prices)
