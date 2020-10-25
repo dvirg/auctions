@@ -95,6 +95,8 @@ def experiment(results_csv_file: str, auction_functions: list, auction_names: st
             for auction_index in range(len(auction_functions)):
                 auction_trade = auction_functions[auction_index](market, recipe)
                 auction_count = auction_trade.num_of_deals()
+                # for j in range(len(stocks_prices[i])):
+                #     print(sorted(stocks_prices[i][j][:num_of_possible_ps*recipe[j]]))
                 if(auction_trade.num_of_deals() > optimal_trade_with_gft_zero.num_of_deals()):
                     # print(sorted(stocks_prices[i][0][:num_of_possible_ps*recipe[0]]))
                     # print(sorted(stocks_prices[i][1][:num_of_possible_ps*recipe[1]]))

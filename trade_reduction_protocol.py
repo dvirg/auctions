@@ -19,7 +19,7 @@ logger.addHandler(logging.StreamHandler(sys.stdout))
 # logger.setLevel(logging.INFO)
 # To enable tracing, set logger.setLevel(logging.INFO)
 
-MAX_VALUE=1000000    # an upper bound (not necessarily tight) on the agents' values.
+MAX_VALUE=100000000    # an upper bound (not necessarily tight) on the agents' values.
 
 
 def convert_category_index(ps_recipe:list, pivot_index:int):
@@ -31,7 +31,7 @@ def convert_category_index(ps_recipe:list, pivot_index:int):
     return len(ps_recipe)-1
 
 
-def budget_balanced_trade_reduction(market:Market, ps_recipe:list):
+def budget_balanced_trade_reduction(market:Market, ps_recipe:list, including_gft_0:bool = False):
     """
     Calculate the trade and prices using generalized-trade-reduction.
     :param market:   contains a list of k categories, each containing several agents.
@@ -195,7 +195,7 @@ def budget_balanced_trade_reduction(market:Market, ps_recipe:list):
                 best_containing_GFT = sum([best_containing_PS[i]*ps_recipe[i] for i in range(len(best_containing_PS))])
                 if -0.0000000000001 < best_containing_GFT and best_containing_GFT < 0.0000000000001:
                     best_containing_GFT = 0
-                if best_containing_GFT >= 0:  # EXTERNAL COMPETITION - KEEP TRADER
+                if best_containing_GFT > 0 or (including_gft_0 and best_containing_GFT == 0):  # EXTERNAL COMPETITION - KEEP TRADER
                     logger.info("    best PS is {},{} with GFT {}. It is positive so it is an external competition.".
                           format(best_containing_PS, ps_recipe, best_containing_GFT))
                     prices = market.calculate_prices_by_external_competition(pivot_category_index, pivot_value, best_containing_PS, ps_recipe)

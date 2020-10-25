@@ -11,7 +11,7 @@ Since: 2019-08
 """
 
 
-MAX_VALUE=1000000    # an upper bound (not necessarily tight) on the agents' values.
+MAX_VALUE=100000000    # an upper bound (not necessarily tight) on the agents' values.
 
 class AgentCategory:
     """

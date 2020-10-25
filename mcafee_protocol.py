@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 # To enable tracing, set logger.setLevel(logging.INFO)
 
-MAX_VALUE=1000000    # an upper bound (not necessarily tight) on the agents' values.
+MAX_VALUE=100000000    # an upper bound (not necessarily tight) on the agents' values.
 
 
 def is_price_good_for_ps(price:float, ps:list)->bool:
