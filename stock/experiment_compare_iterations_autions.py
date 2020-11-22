@@ -46,11 +46,6 @@ from tee_table.tee_table import TeeTable
 from collections import OrderedDict
 from get_stocks_data import getStocksPrices
 
-TABLE_COLUMNS = ["stock_name", "recipe", "num_possible_trades", "optimal_count", "optimal_count_with_gft_zero",
-                 "optimal_gft", "optimal_gft_with_gft_zero"]
-AUCTION_COLUMNS = ["count", "count_ratio", "total_gft", "total_gft_ratio",
-                   "market_gft", "market_gft_ratio"]
-
 def experiment(results_csv_file:str, auction_functions:list, auction_names:str, recipe:tuple,
                nums_of_agents=None, stocks_prices:list=None, stock_names:list=None):
     """
@@ -62,6 +57,11 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
     :param stocks_prices: list of prices for each stock and each agent.
     :param stock_names: list of stocks names which prices are belongs, for naming only.
     """
+    TABLE_COLUMNS = ["stock_name", "recipe", "num_possible_trades", "optimal_count", "optimal_count_with_gft_zero",
+                     "optimal_gft", "optimal_gft_with_gft_zero"]
+    AUCTION_COLUMNS = ["count", "count_ratio", "total_gft", "total_gft_ratio",
+                       "market_gft", "market_gft_ratio"]
+
     if stocks_prices is None:
         (stocks_prices, stock_names) = getStocksPrices(recipe)
     column_names = TABLE_COLUMNS

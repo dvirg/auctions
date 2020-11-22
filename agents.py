@@ -119,7 +119,6 @@ class AgentCategory:
         return AgentCategory(name, values)
 
 
-
 class EmptyCategoryException(Exception):
     pass
 
