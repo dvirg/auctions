@@ -20,7 +20,7 @@ results_file = "results/comparing_sbbs.csv"
 iterations = 10
 
 recipes = []
-recipes += [(i, j) for i in range(1, 10) for j in range(1, 10)]
+recipes += [(i, j) for i in range(1, 10) for j in range(16, 17)]
 recipes += [(i, j, k) for i in range(1, 10) for j in range(1, 10) for k in range(1, 10)]
 recipes += [(i, j, k, m) for i in range(1, 5) for j in range(1, 5) for k in range(1, 5) for m in range(1, 5)]
 recipes += [(i, j, k, m, o) for i in range(1, 5) for j in range(1, 5) for k in range(1, 5) for m in range(1, 5) for o in range(1, 5)]

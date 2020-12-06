@@ -22,17 +22,29 @@ prices.logger.setLevel(logging.INFO)
 
 print("\n\n###### RUNNING DEMO FOR TYPE (1,1)")
 
+print("\n\n###### RUNNING budget_balanced_ascending_auction")
+
 market = Market([
-    AgentCategory("buyer", [1,1,1,1,1]),
-    AgentCategory("seller", [-1,-1,-1,-1,-0.5]),
+    AgentCategory("buyer", [1,1,1]),
+    AgentCategory("seller", [-1,-1,-0.5]),
 ])
 print(budget_balanced_ascending_auction(market, [1,1]))
 
+print("\n\n###### RUNNING mcafee_trade_reduction")
+
 market = Market([
-    AgentCategory("buyer", [1,1,1,1,1]),
-    AgentCategory("seller", [-1,-1,-1,-1,-0.5]),
+    AgentCategory("buyer", [1,1,1]),
+    AgentCategory("seller", [-1,-1,-0.5]),
 ])
 print(mcafee_trade_reduction(market, [1,1]))
+
+print("\n\n###### RUNNING budget_balanced_trade_reduction")
+
+market = Market([
+    AgentCategory("buyer", [1,1,1]),
+    AgentCategory("seller", [-1,-1,-0.5]),
+])
+print(budget_balanced_trade_reduction(market, [1,1], True))
 
 
 print("\n\n###### RUNNING EXPERIMENT FOR DEMO OF TYPE (1,1)")

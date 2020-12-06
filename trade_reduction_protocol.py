@@ -31,7 +31,7 @@ def convert_category_index(ps_recipe:list, pivot_index:int):
     return len(ps_recipe)-1
 
 
-def budget_balanced_trade_reduction(market:Market, ps_recipe:list, including_gft_0:bool = False):
+def budget_balanced_trade_reduction(market:Market, ps_recipe:list, including_gft_0:bool = True):
     """
     Calculate the trade and prices using generalized-trade-reduction.
     :param market:   contains a list of k categories, each containing several agents.
