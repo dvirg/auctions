@@ -185,3 +185,11 @@ iterations,auction_name,recipe,num_of_agents,mean_optimal_count,mean_auction_cou
 1,SBB Ascending Prices,1:1,50,26.0,25.0,96.15,11.54,11.31,98.02,11.31,98.02
 1,McAfee Without Heuristic,1:1,50,27.0,26.0,96.29,14.02,13.92,99.27,11.27,80.4
 1,McAfee Without Heuristic,1:1,50,21.0,20.0,95.23,9.64,9.6,99.56,8.75,90.78
+1,McAfee Stock,1:1,50,25.0,25.0,100.0,13.0,13.0,100.0,13.0,100.0
+1,McAfee Stock,1:1,50,23.0,22.0,95.65,11.35,11.34,99.9,11.09,97.71
+1,SBB External Competition,1:1,50,23.0,22.0,95.65,13.04,12.74,97.71,12.74,97.71
+1,SBB External Competition,1:1,50,22.0,22.0,100.0,9.35,9.35,100.0,9.35,100.0
+1,SBB Ascending Prices,1:1,50,24.0,23.0,95.83,12.86,12.62,98.11,12.62,98.11
+1,SBB Ascending Prices,1:1,50,25.0,25.0,100.0,13.21,13.21,100.0,13.21,100.0
+1,McAfee Without Heuristic,1:1,50,22.0,21.0,95.45,11.63,11.58,99.56,10.51,90.36
+1,McAfee Without Heuristic,1:1,50,24.0,23.0,95.83,12.57,12.57,99.99,12.55,99.86

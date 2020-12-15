@@ -52,7 +52,6 @@ class RecipeTree (NodeMixin):
     4
     >>> print(tree.num_of_deals_explained(prices=[1,2,3,4])[1])
     buyer: 4 potential deals, price=1
-    4 deals overall
     <BLANKLINE>
 
     >>> tree = RecipeTree(categories, [0, [1, None]])   # buyer -> seller
@@ -72,7 +71,6 @@ class RecipeTree (NodeMixin):
     seller: 3 potential deals, price=2
     buyer: 3 out of 4 traders selected, price=1
     seller: all 3 traders selected
-    3 deals overall
     <BLANKLINE>
 
     >>> tree = RecipeTree(categories, [0, [2, None, 3, None]])   # buyer -> producerA, buyer -> producerB
@@ -95,7 +93,6 @@ class RecipeTree (NodeMixin):
     producerB: 4 potential deals, price=4
     buyer: all 4 traders selected, price=1
     producerA + producerB: 4 out of 7 traders selected
-    4 deals overall
     <BLANKLINE>
 
 
@@ -125,7 +122,6 @@ class RecipeTree (NodeMixin):
     producerB: 3 out of 4 traders selected
     buyer: all 4 traders selected, price=1
     seller + producerA: 4 out of 6 traders selected
-    4 deals overall
     <BLANKLINE>
 
     >>> buyer = AgentCategory("buyer", [90,80,70,60,50,40])
@@ -142,8 +138,8 @@ class RecipeTree (NodeMixin):
     250
     >>> tree.num_of_deals()
     5
-    >>> tree.largest_categories()[-1]    # OLD: ['buyer']  NEW: ['seller', 'producerA']
-    ['seller', 'producerA']
+    >>> tree.largest_categories()[-1]
+    ['buyer']
 
     >>> producerA.values = [-1, -3, -5, -7, -9, -11, -13]
     >>> producerB.values = [-2, -4, -6, -8, -10]
@@ -298,8 +294,8 @@ class RecipeTree (NodeMixin):
         True
         >>> RecipeTree(categories, [7, [8, [5, [6,None]]]]).largest_categories(indices=True)[-1] != [5]
         True
-        >>> RecipeTree(categories, [6, [3, None, 4, [2,None]]]).largest_categories(indices=True)[-1]  # OLD:[6] NEW:[3,4]
-        [3, 4]
+        >>> RecipeTree(categories, [6, [3, None, 4, [2,None]]]).largest_categories(indices=True)[-1]
+        [6]
         >>> RecipeTree(categories, [6, [3, None, 2, [4,None]]]).largest_categories(indices=True)[-1]
         [6]
         >>> RecipeTree(categories, [6, [3, None, 7, [5,None]]]).largest_categories(indices=True)[-1]
@@ -312,40 +308,36 @@ class RecipeTree (NodeMixin):
         [6, 6]
         >>> RecipeTree(categories, [8, [6, [4,None], 4, [6,None]]]).largest_categories(indices=True)[-1]
         [6, 6]
-        >>> RecipeTree(categories, [9, [6, [4,None], 4, [6,None]]]).largest_categories(indices=True)[-1]  # OLD:[9]  NEW[6,6]
-        [6, 6]
+        >>> RecipeTree(categories, [9, [6, [4,None], 4, [6,None]]]).largest_categories(indices=True)[-1]
+        [9]
         >>> RecipeTree(categories, [6, [0, None, 6, None]]).largest_categories(indices=True)
         (6, 6, [0, 6])
         >>> RecipeTree(categories, [6, [6, None, 0, None]]).largest_categories(indices=True)
         (6, 6, [6, 0])
 
-        >>> categories = [AgentCategory(str(index), [22,11]) for index in range(10)]  # create categories of the same size (size=2)
+        >>> categories = [AgentCategory(str(index), [22,11]) for index in range(10)]  # create categories of the same size
         >>> tree = RecipeTree(categories, [0, [1, [2, [3, [4, None]]]]])
         >>> tree.largest_categories(indices=True)[-1]
         [4]
         >>> x=categories[4].values.pop()
         >>> tree.largest_categories(indices=True)[-1]
-        [3]
-        >>> x=categories[3].values.pop()
-        >>> tree.largest_categories(indices=True)[-1]
-        [2]
-        >>> x=categories[2].values.pop()
+        [0]
+        >>> x=categories[0].values.pop()
         >>> tree.largest_categories(indices=True)[-1]
         [1]
         >>> x=categories[1].values.pop()
         >>> tree.largest_categories(indices=True)[-1]
-        [0]
-        >>> x=categories[0].values.pop()
+        [2]
+        >>> x=categories[2].values.pop()
+        >>> tree.largest_categories(indices=True)[-1]
+        [3]
+        >>> x=categories[3].values.pop()
         >>> tree.largest_categories(indices=True)[-1]
         [4]
         """
         self_category_size = self.category.size()
         self_category_index_or_name = self.category_index if indices else self.name
-
-        children_category_size = sum([child.category.size() for child in self.children], 0)
-        # print("self_category_size: ",self_category_size)
-        # print("children_category_size: ",children_category_size)
-        if self_category_size > children_category_size or children_category_size==0:
+        if len(self.children) == 0:
             largest_category_size = combined_category_size = self_category_size
             largest_categories = [self_category_index_or_name]
         else:
@@ -357,9 +349,14 @@ class RecipeTree (NodeMixin):
                 children_largest_category_size = max(children_largest_category_size,child_largest_category_size)
                 children_combined_category_size += child_combined_category_size
                 children_largest_categories += child_largest_categories
-            largest_category_size = children_largest_category_size
-            combined_category_size = self_category_size
-            largest_categories = children_largest_categories
+            if children_combined_category_size >= self_category_size:
+                largest_category_size = children_largest_category_size
+                combined_category_size = self_category_size
+                largest_categories = children_largest_categories
+            else:
+                largest_category_size = self_category_size
+                combined_category_size = children_combined_category_size
+                largest_categories = [self_category_index_or_name]
         return (largest_category_size, combined_category_size, largest_categories)
 
 
@@ -377,7 +374,7 @@ class RecipeTree (NodeMixin):
         return num_of_deals
 
 
-    def num_of_deals_explained(self, prices:List[float], add_num_of_overall_deals=True)->str:
+    def num_of_deals_explained(self, prices:List[float])->str:
         """
         Return a detailed explanation of the number of deals done,
         including what categories require randomization.
@@ -389,7 +386,7 @@ class RecipeTree (NodeMixin):
             num_of_deals = self_num_of_deals
             explanation = "{}: {} potential deals, price={}\n".format(self.name, self_num_of_deals, self_price)
         else:
-            children_num_of_deals_explained = [child.num_of_deals_explained(prices,add_num_of_overall_deals=False) for child in self.children]
+            children_num_of_deals_explained = [child.num_of_deals_explained(prices) for child in self.children]
             # logger.debug(children_num_of_deals_explained)
             children_num_of_deals = [t[0] for t in children_num_of_deals_explained]
             sum_children_num_of_deals = sum(children_num_of_deals)
@@ -408,8 +405,7 @@ class RecipeTree (NodeMixin):
                 explanation += "{}: all {} traders selected\n".format(sum_children_names, sum_children_num_of_deals)
             else:
                 explanation += "{}: {} out of {} traders selected\n".format(sum_children_names, num_of_deals, sum_children_num_of_deals)
-        if add_num_of_overall_deals:
-            explanation += "{} deals overall\n".format(num_of_deals)
+        explanation += "{} deals overall\n".format(num_of_deals)
         return (num_of_deals,explanation)
 
 

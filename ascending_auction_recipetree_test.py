@@ -153,8 +153,38 @@ class TestAscendingAuctionWithTwoRecpies(unittest.TestCase):
             expected_num_of_deals=4, expected_prices=[10.0, -10.0, None, None])
         # show_log()
         check_1100_1011(buyers=[19, 17, 15, 13, 11, 9], sellers=[], producers=[-6,-5,-4,-3,-2,-1], movers=[-6,-5,-4,-3,-2,-1],
-            expected_num_of_deals=4, expected_prices=[11, None, -6, -5])
+            expected_num_of_deals=4, expected_prices=[10, None, -5, -5])
         # hide_log()
+
+
+    def test_market_11100_10011(self):
+        """
+        Unit-tests with two recipes: [1,1,0,0] and [1,0,1,1].
+        This is the smallest case in which multi-recipe substantially differs than single-recipe.
+        :return:
+        """
+
+        def check_11100_10011(buyers: List[float], sellers1: List[float], sellers2: List[float], producers1: List[float], producers2: List[float],
+                           expected_num_of_deals: int, expected_prices: List[float]):
+            market = Market([
+                AgentCategory("buyer", buyers),
+                AgentCategory("seller1", sellers1),
+                AgentCategory("seller2", sellers2),
+                AgentCategory("producer1", producers1),
+                AgentCategory("producer2", producers2),
+            ])
+            ps_recipe_struct = [0, [1, [2, None], 3, [4, None]]]
+            self._check_market(market, ps_recipe_struct, expected_num_of_deals, expected_prices)
+
+        check_11100_10011(buyers=[400, 300, 200, 100], sellers1=[-1, -2], sellers2=[-3, -4], producers1=[-5,-6], producers2=[-7,-8],
+            expected_num_of_deals=2, expected_prices=[None, None, None, None, None])
+
+    AgentCategory("buyer", [400, 300, 200, 100]),
+    AgentCategory("seller1", [-1, -2]),
+    AgentCategory("seller2", [-3, -4]),
+    AgentCategory("producer1", [-5, -6]),
+    AgentCategory("producer2", [-7, -8]),
+
 
 
 if __name__ == '__main__':

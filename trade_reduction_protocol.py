@@ -164,7 +164,7 @@ def budget_balanced_trade_reduction(market:Market, ps_recipe:list, including_gft
 
     logger.info("\n#### Budget-Balanced Trade Reduction\n")
     logger.info(market)
-    (optimal_trade, remaining_market) = market.optimal_trade(ps_recipe, add_lowest_negative_set=True)
+    (optimal_trade, remaining_market) = market.optimal_trade(ps_recipe)
     for category in remaining_market.categories:
         if len(category)==0:
             category.append(-MAX_VALUE)
@@ -193,8 +193,6 @@ def budget_balanced_trade_reduction(market:Market, ps_recipe:list, including_gft
                       format(pivot_category.name, pivot_value))
                 best_containing_PS = remaining_market.best_containing_PS(pivot_category_index, pivot_value)
                 best_containing_GFT = sum([best_containing_PS[i]*ps_recipe[i] for i in range(len(best_containing_PS))])
-                if -0.0000000000001 < best_containing_GFT and best_containing_GFT < 0.0000000000001:
-                    best_containing_GFT = 0
                 if best_containing_GFT > 0 or (including_gft_0 and best_containing_GFT == 0):  # EXTERNAL COMPETITION - KEEP TRADER
                     logger.info("    best PS is {},{} with GFT {}. It is positive so it is an external competition.".
                           format(best_containing_PS, ps_recipe, best_containing_GFT))

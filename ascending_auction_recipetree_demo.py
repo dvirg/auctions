@@ -2,10 +2,10 @@
 
 """
 Demonstration of a multiple-clock strongly-budget-balanced ascending auction
-for a multi-lateral market with one buyer per two sellers (recipe: 1,2)
+for a multi-lateral market with a recipe tree
 
 Author: Erel Segal-Halevi
-Since:  2019-08
+Since:  2020-08
 """
 
 from markets import Market
@@ -56,6 +56,8 @@ prices.logger.setLevel(logging.INFO)
 #     AgentCategory("producerB", [-3, -7]),
 # ])
 # print(budget_balanced_ascending_auction(market, recipes_1100_1011))
+
+import sys, os; sys.path.insert(0, os.path.abspath('..'))
 
 
 print("\n\n###### TEST MULTI RECIPE AUCTION - 4 PATHS")

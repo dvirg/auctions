@@ -83,13 +83,13 @@ class TestAscendingAuction(unittest.TestCase):
             self._check_market(market, ps_recipe, expected_num_of_deals, expected_prices)
 
         check_1_1_1(buyers=[9,8], mediators=[-1,-2], sellers=[-4,-3],
-            expected_num_of_deals=1, expected_prices=[8,-2,-6])
-        check_1_1_1(buyers=[9,8], mediators=[-1,-2], sellers=[-4,-3,-10],
-            expected_num_of_deals=1, expected_prices=[8,-2,-6])
-        check_1_1_1(buyers=[9,8], mediators=[-1,-2], sellers=[-4,-3,-5],
-            expected_num_of_deals=1, expected_prices=[8,-3,-5])
-        check_1_1_1(buyers=[9,8], mediators=[-1,-2], sellers=[-4,-3,-2],
             expected_num_of_deals=1, expected_prices=[8,-4,-4])
+        check_1_1_1(buyers=[9,8], mediators=[-1,-2], sellers=[-4,-3,-10],
+            expected_num_of_deals=1, expected_prices=[8,-4,-4])
+        check_1_1_1(buyers=[9,8], mediators=[-1,-2], sellers=[-4,-3,-5],
+            expected_num_of_deals=1, expected_prices=[8,-4,-4])
+        check_1_1_1(buyers=[9,8], mediators=[-1,-2], sellers=[-4,-3,-2],
+            expected_num_of_deals=1, expected_prices=[8,-5,-3])
         check_1_1_1(buyers=[9,8,7], mediators=[-1,-2,-3], sellers=[-4,-3,-2],
             expected_num_of_deals=2, expected_prices=[7,-3,-4])
         check_1_1_1(buyers=[9,8,4], mediators=[-1,-2,-3], sellers=[-4,-3,-2],
@@ -97,13 +97,13 @@ class TestAscendingAuction(unittest.TestCase):
 
         # RUNNING EXAMPLE FROM THE PAPER
         check_1_1_1(buyers=[17, 14, 13, 9, 6], mediators=[-1, -3, -4, -7, -10], sellers=[-1, -4, -5, -8, -11],
-            expected_num_of_deals=2, expected_prices=[13,-5,-8])
+            expected_num_of_deals=2, expected_prices=[13,-7,-6])
         # SIMILAR EXAMPLE, WHERE PRICE STOPS BETWEEN SELLERS:
         check_1_1_1(buyers=[17, 14, 13, 9, 6], mediators=[-1, -4, -5, -8, -11], sellers=[-1, -3, -6, -7, -10],
-            expected_num_of_deals=2, expected_prices=[13,-6,-7])
+            expected_num_of_deals=2, expected_prices=[13,-7,-6])
         # SIMILAR EXAMPLE, WHERE PRICE STOPS BETWEEN MEDIATORS:
         check_1_1_1(buyers=[17, 14, 13, 9, 6], mediators=[-1, -3, -6, -7, -10], sellers=[-1, -4, -6.5, -8, -11],
-            expected_num_of_deals=2, expected_prices=[13, -6, -7])
+            expected_num_of_deals=2, expected_prices=[13, -6.5, -6.5])
         # SIMILAR EXAMPLE, WHERE PRICE STOPS BETWEEN BUYERS:
         check_1_1_1(buyers=[17, 14, 13, 9, 6], mediators=[-1, -3, -6, -7, -10], sellers=[-1, -4, -7.5, -8, -11],
             expected_num_of_deals=2, expected_prices=[13.5, -6, -7.5])

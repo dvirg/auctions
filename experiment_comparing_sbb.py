@@ -89,6 +89,7 @@ def experiment(results_csv_file:str, recipes:tuple, value_ranges:list, nums_of_a
             else:
                 ascending_wins_gft += 1
         num_agents = len(nums_of_agents)
+
         results_table.add(OrderedDict((
             ("recipe", recipe),
             ("external_wins_gft", int(external_wins_gft*100 / num_agents)),
