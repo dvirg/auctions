@@ -10,9 +10,12 @@ Since:  2020-08
 import pandas as pd
 from os import listdir
 from os.path import isfile, join
+import random
 STOCKS = 'stocks'
 POSITIVE_TYPES = ['High', 'Close']
 NEGATIVE_TYPES = ['Open', 'Low']
+TYPES = [*POSITIVE_TYPES, *NEGATIVE_TYPES]
+
 
 def getPrices(stockFile:str, recipe:tuple):
     df = pd.read_csv(stockFile)
@@ -62,3 +65,15 @@ def getStocksPrices(recipe:tuple):
     return [getPrices(join(STOCKS, stockFile), recipe) for stockFile in onlyfiles], [f[0:-4] for f in onlyfiles]
 
 
+def getPricesTree(stockFile:str, recipe:tuple):
+    df = pd.read_csv(stockFile)
+    data = []
+    for t in TYPES:
+        for price in df[t].to_numpy():
+            data.append(int(price*1000))
+    random.shuffle(data)
+    print(len(data))
+    return data
+
+
+#print(getPricesTree('stocks\\T.csv', (1,1)))
