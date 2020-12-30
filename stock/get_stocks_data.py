@@ -65,15 +65,28 @@ def getStocksPrices(recipe:tuple):
     return [getPrices(join(STOCKS, stockFile), recipe) for stockFile in onlyfiles], [f[0:-4] for f in onlyfiles]
 
 
-def getPricesTree(stockFile:str, recipe:tuple):
-    df = pd.read_csv(stockFile)
+def getStocksTreePrices(recipe_tree: list, agents_counts: list, agents_values: list):
+    onlyfiles = [f for f in listdir(STOCKS) if isfile(join(STOCKS, f))]
+    return [get_prices_tree(join(STOCKS, stockFile), agents_counts, agents_values) for stockFile in onlyfiles], [f[0:-4] for f in onlyfiles]
+
+def get_prices_tree(stock_file: str, agents_counts: list, agents_values: list):
+    df = pd.read_csv(stock_file)
     data = []
     for t in TYPES:
         for price in df[t].to_numpy():
             data.append(int(price*1000))
     random.shuffle(data)
     print(len(data))
-    return data
+    split_data = [[] for _ in range(len(agents_counts))]
+    recipe_size = sum(agents_counts)
+    data_index = 0
+    for agent_index in range(len(agents_counts)):
+        for i in range(int(len(data) / recipe_size * agents_counts[agent_index])):
+            sign = -1 if agent_index > 0 else 1
+            split_data[agent_index].append(sign * data[data_index] * agents_values[agent_index])
+            data_index += 1
+    return split_data
 
 
 #print(getPricesTree('stocks\\T.csv', (1,1)))
+

@@ -55,6 +55,9 @@ class TradeWithMultipleRecipes(Trade):
     def gain_from_trade(self, including_auctioneer:bool=True):
         return self.gft_cache
 
+    def optimal_trade(self):
+        return self.recipe_tree.optimal_trade()
+
     def __repr__(self):
         if self.num_of_deals_cache==0:
             return "No trade"

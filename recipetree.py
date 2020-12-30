@@ -264,7 +264,7 @@ class RecipeTree (NodeMixin):
         * third is the optimal GFT.
         """
         values = self.combined_values_detailed()
-        optimal_trade_values = [t for t in values if sum(t)>0]
+        optimal_trade_values = [t for t in values if sum(t)>=0]
         optimal_trade_count = len(optimal_trade_values)
         optimal_trade_values_GFT = sum(flatten(optimal_trade_values))
         return (optimal_trade_values, optimal_trade_count, optimal_trade_values_GFT)
