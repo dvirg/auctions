@@ -60,6 +60,22 @@ def getPrices(stockFile:str, recipe:tuple):
             #     data[i][j] = (int(data[i][j]*10000))/10000
     return long_data
 
+def getAllPricesShuffled(stockFile:str):
+    df = pd.read_csv(stockFile)
+    data = [df[type].to_numpy() for type in TYPES]
+    long_data = []
+    for i in range(len(data)):
+        for j in range(len(data[i])):
+            long_data.append(int(data[i][j]*1000))
+    random.shuffle(long_data)
+    return long_data
+
+#print(getAllPricesShuffled(join('stocks\\A.csv')))
+
+def getStocksPricesShuffled():
+    onlyfiles = [f for f in listdir(STOCKS) if isfile(join(STOCKS, f))]
+    return [getAllPricesShuffled(join(STOCKS, stockFile)) for stockFile in onlyfiles], [f[0:-4] for f in onlyfiles]
+
 def getStocksPrices(recipe:tuple):
     onlyfiles = [f for f in listdir(STOCKS) if isfile(join(STOCKS, f))]
     return [getPrices(join(STOCKS, stockFile), recipe) for stockFile in onlyfiles], [f[0:-4] for f in onlyfiles]

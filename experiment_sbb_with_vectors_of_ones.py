@@ -26,3 +26,9 @@ for num_of_seller_categories in (2,4,8,16):
                nums_of_agents = (2, 3, 4, 5, 10, 15, 25, 50, 100, 500, 1000),
                num_of_iterations = iterations
                )
+
+    experiment(results_file,budget_balanced_trade_reduction, "SBB External Competition", recipe=num_of_categories*(1,),
+               value_ranges   = [(1, 1000*num_of_seller_categories)] + [(-1000,1)]*num_of_seller_categories,
+               nums_of_agents = (2, 3, 4, 5, 10, 15, 25, 50, 100, 500, 1000),
+               num_of_iterations = iterations
+               )

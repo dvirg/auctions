@@ -31,7 +31,7 @@ recipe_paper_example = [0, [1, None, 2, [3, None]]]
 
 recipes = [recipe_paper_example] #recipes_111, recipes_4paths, recipe_paper_example, recipe_paper_start]
 
-run_stock = False
+run_stock = True
 for recipe in recipes:
     if run_stock:
         experiment_ascending_auction_recipetree_stock.experiment(results_file + "_stock.csv", recipe=recipe,

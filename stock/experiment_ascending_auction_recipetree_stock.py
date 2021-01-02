@@ -113,15 +113,15 @@ def experiment(results_csv_file: str, recipe: list, agent_counts:list, agent_val
                     print(market.categories)
             results = [("stockname", stock_names[i]),
                        ("recipe", recipe_str),
-                       ("numpossibletrades", round(num_of_possible_ps)),
-                       ("optimalcount", round(optimal_count, 1)),
-                       ("optimalgft", round(optimal_gft, 1)),
-                       ("auctioncount", round(auction_count,1)),
-                       ("countratio", 0 if optimal_count==0 else int(auction_count / optimal_count*100000)/1000),
-                       ("gft", round(gft,1)),
-                       ("gftratio", 0 if optimal_gft==0 else int(gft / optimal_gft*100000)/1000)
+                       ("numpossibletrades", num_of_possible_ps),
+                       ("optimalcount", optimal_count),
+                       ("optimalgft", optimal_gft),
+                       ("auctioncount", auction_count),
+                       ("countratio", 0 if optimal_count==0 else auction_count / optimal_count*100),
+                       ("gft", gft),
+                       ("gftratio", 0 if optimal_gft==0 else gft / optimal_gft*100)
                        ]
-            results_table.add(OrderedDict(results))
+            #results_table.add(OrderedDict(results))
             if len(total_results[str(num_of_agents_per_category)]) == 0:
                 total_results[str(num_of_agents_per_category)] = results[0:len(results)]
             else:
@@ -135,6 +135,8 @@ def experiment(results_csv_file: str, recipe: list, agent_counts:list, agent_val
             if index > 2:
                 if 'ratio' in results[index][0]:
                     results[index] = (results[index][0], int(results[index][1]/len(stock_names)*1000)/1000)
+                elif 'count' in results[index][0]:
+                    results[index] = (results[index][0], int(results[index][1]/len(stock_names)*100)/100)
                 else:
                     results[index] = (results[index][0], round(results[index][1]/len(stock_names),1))
             elif index == 0:
