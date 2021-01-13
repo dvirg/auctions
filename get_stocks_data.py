@@ -11,7 +11,7 @@ import pandas as pd
 from os import listdir
 from os.path import isfile, join
 import random
-STOCKS = 'stocks'
+STOCKS = join('stock','stocks')
 POSITIVE_TYPES = ['High', 'Close']
 NEGATIVE_TYPES = ['Open', 'Low']
 TYPES = [*POSITIVE_TYPES, *NEGATIVE_TYPES]
@@ -75,7 +75,7 @@ def getAllPricesShuffled(stockFile:str):
 def getStocksPricesShuffled():
     onlyfiles = [f for f in listdir(STOCKS) if isfile(join(STOCKS, f))]
     return [getAllPricesShuffled(join(STOCKS, stockFile)) for stockFile in onlyfiles], [f[0:-4] for f in onlyfiles]
-
+#print(getStocksPricesShuffled())
 def getStocksPrices(recipe:tuple):
     onlyfiles = [f for f in listdir(STOCKS) if isfile(join(STOCKS, f))]
     return [getPrices(join(STOCKS, stockFile), recipe) for stockFile in onlyfiles], [f[0:-4] for f in onlyfiles]

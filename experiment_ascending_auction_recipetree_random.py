@@ -58,7 +58,8 @@ def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_a
     :param stock_names: list of stocks names which prices are belongs, for naming only.
     """
     TABLE_COLUMNS = ["iterations", "recipe", "numofagents",
-                     "meanoptimalcount", "meanauctioncount", "countratio",
+                     "meanoptimalcount", "meanoptimalkmin", "meanoptimalkmax","gftformula",
+                     "meanauctioncount", "countratio",
                      "meanoptimalgft", "meanauctiontotalgft", "totalgftratio"]
     print('recipe:', recipe)
     results_table = TeeTable(TABLE_COLUMNS, results_csv_file)
@@ -66,7 +67,7 @@ def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_a
     category_size_list = get_agents_analyze(recipe)
     children_counts = get_children_counts(recipe, category_size_list)
     for i in range(len(nums_of_agents)):
-        sum_optimal_count = sum_auction_count = 0  # count the number of deals done in the optimal vs. the actual auction.
+        sum_optimal_count = sum_auction_count = sum_optimal_kmin = sum_optimal_kmax = 0  # count the number of deals done in the optimal vs. the actual auction.
         sum_optimal_gft = sum_auction_total_gft = sum_auction_market_gft = 0
         for iteration in range(num_of_iterations):
             if iteration % 10000 == 0:
@@ -81,16 +82,11 @@ def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_a
             market = Market(agents)
             #print(agents)
             recipe_tree = RecipeTree(market.categories, recipe)
-            optimal_trade, optimal_count, optimal_gft = recipe_tree.optimal_trade()
+            optimal_trade, optimal_count, optimal_gft, kmin, kmax = recipe_tree.optimal_trade_with_counters()
             #print('optimal trade:', optimal_trade, optimal_count, optimal_gft)
             auction_trade = budget_balanced_ascending_auction(market, recipe)
             auction_count = auction_trade.num_of_deals()
             gft = auction_trade.gain_from_trade()
-            #if auction_count < optimal_count - 1:
-            #    #the auction count is less more than 1 than the optimal count.
-            #    print('Warning!!!', 'optimal_count:', optimal_count, 'auction_count:', auction_count, 'num_of_possible_ps:', num_of_possible_ps)
-            #    if num_of_possible_ps < 10:
-            #        print(market.categories)
             #if optimal_count > 0 and gft < optimal_gft * (1 - 1/optimal_count):
                 #the auction count is less more than 1 than the optimal count.
             #    print('Warning GFT!!!', 'optimal_count:', optimal_count, 'auction_count:', auction_count,
@@ -101,20 +97,33 @@ def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_a
             sum_optimal_count += optimal_count
             sum_auction_count += auction_count
 
+            sum_optimal_kmin += kmin
+            sum_optimal_kmax += kmax
+
             sum_optimal_gft += optimal_gft
             sum_auction_total_gft += gft
 
+            if auction_count < optimal_count - 2:
+                #the auction count is less more than 1 than the optimal count.
+                print('Warning!!!', 'optimal_count:', optimal_count, 'auction_count:', auction_count, 'num_of_possible_ps:', nums_of_agents[i])
+                if nums_of_agents[i] < 10:
+                    print(market.categories)
+
         # print("Num of times {} attains the maximum GFT: {} / {} = {:.2f}%".format(title, count_optimal_gft, num_of_iterations, count_optimal_gft * 100 / num_of_iterations))
         # print("GFT of {}: {:.2f} / {:.2f} = {:.2f}%".format(title, sum_auction_gft, sum_optimal_gft, 0 if sum_optimal_gft==0 else sum_auction_gft * 100 / sum_optimal_gft))
-        results_table.add(OrderedDict((
+        kmin_mean = sum_optimal_kmin/num_of_iterations
+        results_table.add(OrderedDict([
             ("iterations", num_of_iterations),
             ("recipe", recipe_str),
             ("numofagents", nums_of_agents[i]),
-            ("meanoptimalcount", round(sum_optimal_count/num_of_iterations,2)),
-            ("meanauctioncount", round(sum_auction_count/num_of_iterations,2)),
-            ("countratio", 0 if sum_optimal_count==0 else int((sum_auction_count / sum_optimal_count) * 100000)/1000),
-            ("meanoptimalgft", round(sum_optimal_gft/num_of_iterations,1)),
-            ("meanauctiontotalgft", round(sum_auction_total_gft/num_of_iterations,1)),
-            ("totalgftratio", 0 if sum_optimal_gft==0 else round(sum_auction_total_gft / sum_optimal_gft*100,3)),
-        )))
+            ("meanoptimalcount", sum_optimal_count/num_of_iterations),
+            ("meanoptimalkmin", kmin_mean),
+            ("meanoptimalkmax", sum_optimal_kmax/num_of_iterations),
+            ("gftformula", (kmin_mean - 1)/(kmin_mean + 1)*100 if (kmin_mean - 1)/(kmin_mean + 1) > 0 else 0),
+            ("meanauctioncount", sum_auction_count/num_of_iterations),
+            ("countratio", 0 if sum_optimal_count==0 else (sum_auction_count / sum_optimal_count) * 100),
+            ("meanoptimalgft", sum_optimal_gft/num_of_iterations),
+            ("meanauctiontotalgft", sum_auction_total_gft/num_of_iterations),
+            ("totalgftratio", 0 if sum_optimal_gft==0 else sum_auction_total_gft / sum_optimal_gft*100),
+        ]))
     results_table.done()

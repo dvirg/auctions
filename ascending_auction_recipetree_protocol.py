@@ -46,11 +46,17 @@ class TradeWithMultipleRecipes(Trade):
         self.num_categories = len(categories)
         self.recipe_tree = recipe_tree
         self.prices = prices
-        (self.num_of_deals_cache, self.num_of_deals_explanation_cache) = recipe_tree.num_of_deals_explained(prices)
+        (self.num_of_deals_cache, self.num_of_deals_explanation_cache, self.kmin, self.kmax) = recipe_tree.num_of_deals_explained(prices)
         self.gft_cache = recipe_tree.optimal_trade_GFT()
 
     def num_of_deals(self):
         return self.num_of_deals_cache
+
+    def min_num_of_deals(self):
+        return self.kmin
+
+    def max_num_of_deals(self):
+        return self.kmax
 
     def gain_from_trade(self, including_auctioneer:bool=True):
         return self.gft_cache
@@ -78,10 +84,28 @@ def budget_balanced_ascending_auction(
 
     :return: Trade object, representing the trade and prices.
 
-    >>> logger.setLevel(logging.WARNING)
+    >>> logger.setLevel(logging.DEBUG)
     >>> # ONE BUYER, ONE SELLER
     >>> recipe_11 = [0, [1, None]]
     >>>
+    >>> recipe_1100_1011 = [0, [1, None, 2, [3, None]]]
+    >>>
+    >>> market = Market([AgentCategory("buyer", [27.,21., 17.,11., 3.]), AgentCategory("seller", [-4.0, -5.0, -11.0]), AgentCategory("A", [-2.0, -3.0, -11.0]), AgentCategory("B", [-1.0, -2.0, -8.0])])
+    >>> print(market); print(budget_balanced_ascending_auction(market, recipe_1100_1011))
+    Traders: [buyer: [27.0, 21.0, 17.0, 11.0], seller: [-4.0, -5.0], A: [-2.0, -3.0], B: [-1.0, -2.0]]
+    seller: 1 potential deals, price=-5.0
+    B: 1 potential deals, price=-2.0
+    A: all 1 traders selected, price=-3.0
+    B: all 1 traders selected
+    buyer: 2 out of 4 traders selected, price=5.0
+    seller + A: all 2 traders selected
+    2 deals overall
+
+    >>> market = Market([AgentCategory("buyer", [17.,11.]), AgentCategory("seller", [-5.0]), AgentCategory("A", [-3.0]), AgentCategory("B", [-2.0])])
+    >>> print(market); print(budget_balanced_ascending_auction(market, recipe_1100_1011))
+    Traders: [buyer: [17.,11.], seller: [-5.0], A: [-3.0], B: [-2.0]]
+
+
     >>> market = Market([AgentCategory("buyer", [9.]),  AgentCategory("seller", [-4.])])
     >>> print(market); print(budget_balanced_ascending_auction(market, recipe_11))
     Traders: [buyer: [9.0], seller: [-4.0]]
@@ -109,7 +133,10 @@ def budget_balanced_ascending_auction(
     buyer: 1 out of 2 traders selected, price=4.0
     seller: all 1 traders selected
     1 deals overall
+
     """
+
+
     logger.info("\n#### Multi-Recipe Budget-Balanced Ascending Auction\n")
     logger.info(market)
     logger.info("Procurement-set recipe struct: {}".format(ps_recipe_struct))

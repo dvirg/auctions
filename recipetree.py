@@ -238,6 +238,39 @@ class RecipeTree (NodeMixin):
         return values
 
 
+    def combined_values_detailed_with_counters(self) -> list:
+        """
+        Combine the values in all categories of the current subtree into a single value-list.
+        Categories in siblings are combined by uniting the sets and sorting it in descending order.
+        Categories in parent-child are combined by sorting each set in descending order and creating elementwise sums.
+
+        Similar to combined_values, but keeps all the summed-up values instead of just the sum.
+        """
+        self_values = self.category.values
+        if len(self.children) == 0:
+            deals_counter = {'counter': 0}
+            values = [(value, deals_counter) for value in self_values]
+        else:
+            #List of lists of tuples of children that each tuple has agent value and counter object to count the k for each path
+            children_combined_values_detailed_list = [child.combined_values_detailed_with_counters() for child in self.children]
+            #put all together:
+            children_values = []
+            for child in self.children:
+                children_values = children_values + child.combined_values_detailed_with_counters()
+            #Sort
+            children_values.sort(reverse=True, key=lambda x: x[0])
+            #Sort the parent
+            self_values.sort(reverse=True)
+            #Get the min size
+            min_len = min(len(self_values), len(children_values))
+            #sum the parent with its child value
+            for i in range(min_len):
+                children_values[i] = (children_values[i][0] + self_values[i], children_values[i][1])
+            values = children_values[0: min_len]
+
+            logger.debug("children_values: %s", values)
+        return values
+
     def combined_values_detailed(self) -> list:
         """
         Combine the values in all categories of the current subtree into a single value-list.
@@ -256,6 +289,31 @@ class RecipeTree (NodeMixin):
             values = [tuple(flatten(t)) for t in zip(self_values, children_values)]
         return values
 
+    def optimal_trade_with_counters(self)->(list,int,float, int, int):
+        """
+        :return: a tuple:
+        * first element is the list of deals in the optimal trade;
+        * second element is the optimal num of deals (k);
+        * third is the optimal GFT.
+        """
+        values = self.combined_values_detailed_with_counters()
+        optimal_trade_values = [t for t in values if t[0]>=0]
+        for value in optimal_trade_values:
+            value[1]['counter'] += 1
+        kmin = optimal_trade_values[0][1]['counter'] if len(optimal_trade_values) > 0 else 99999
+        kmax = 0
+        optimal_trade_count = 0
+        optimal_trade_values_GFT = 0
+        for value in optimal_trade_values:
+            if value[1]['counter'] > 0:
+                if kmin > value[1]['counter']:
+                    kmin = value[1]['counter']
+                if kmax < value[1]['counter']:
+                    kmax = value[1]['counter']
+                optimal_trade_count += 1
+                optimal_trade_values_GFT += value[0]
+        return optimal_trade_values, optimal_trade_count, optimal_trade_values_GFT, kmin, kmax
+
     def optimal_trade(self)->(list,int,float):
         """
         :return: a tuple:
@@ -273,7 +331,7 @@ class RecipeTree (NodeMixin):
         """
         Calculate the maximum possible GFT for the given category tree.
         """
-        return sum([v for v in self.combined_values() if v > 0])
+        return sum([v for v in self.combined_values() if v >= 0])
 
 
     def largest_categories(self, indices=False) -> (int,list):
@@ -377,7 +435,8 @@ class RecipeTree (NodeMixin):
         return num_of_deals
 
 
-    def num_of_deals_explained(self, prices:List[float], add_num_of_overall_deals=True)->str:
+    def num_of_deals_explained(self, prices:List[float], add_num_of_overall_deals=True)-> tuple[
+        Union[int, Any], str, Any, Any]:
         """
         Return a detailed explanation of the number of deals done,
         including what categories require randomization.
@@ -388,11 +447,17 @@ class RecipeTree (NodeMixin):
         if len(self.children) == 0:
             num_of_deals = self_num_of_deals
             explanation = "{}: {} potential deals, price={}\n".format(self.name, self_num_of_deals, self_price)
+            kmin = self_num_of_deals
+            kmax = self_num_of_deals
         else:
             children_num_of_deals_explained = [child.num_of_deals_explained(prices,add_num_of_overall_deals=False) for child in self.children]
             # logger.debug(children_num_of_deals_explained)
             children_num_of_deals = [t[0] for t in children_num_of_deals_explained]
+            children_kmins = [t[2] for t in children_num_of_deals_explained]
+            children_kmaxs = [t[3] for t in children_num_of_deals_explained]
             sum_children_num_of_deals = sum(children_num_of_deals)
+            kmin = min(children_kmins)
+            kmax = max(children_kmaxs)
             # logger.debug(children_num_of_deals)
             children_explanations = [t[1] for t in children_num_of_deals_explained]
             # logger.debug(children_explanations)
@@ -410,7 +475,7 @@ class RecipeTree (NodeMixin):
                 explanation += "{}: {} out of {} traders selected\n".format(sum_children_names, num_of_deals, sum_children_num_of_deals)
         if add_num_of_overall_deals:
             explanation += "{} deals overall\n".format(num_of_deals)
-        return (num_of_deals,explanation)
+        return (num_of_deals,explanation, kmin, kmax)
 
 
 
