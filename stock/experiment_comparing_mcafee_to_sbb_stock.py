@@ -27,7 +27,6 @@ results_file = "results/experiment_comparing_mcafee_to_sbb_stock.csv"
 experiment(results_file,
            [mcafee_trade_reduction, mcafee_without_heuristic,
             budget_balanced_trade_reduction, budget_balanced_ascending_auction],
-           ["McAfee", "McAfee_Without_Heuristic", "SBB_External_Competition", "SBB_Ascending_Prices"],
+           ["McAfee", "McAfeeWithoutHeuristic", "SBBExternalCompetition", "SBBAscendingPrices"],
            recipe=recipe,
-           nums_of_agents = (2, 3, 4, 5, 10, 15, 25, 50, 100, 500, 1000, 2000, 5000, 10000, 20000, 50000,
-                             100000, 200000, 500000, 1000000))
+           nums_of_agents = (2, 3, 4, 5, 10, 15, 25, 50, 100, 500, 1000, 2000, 5000))#, 10000, 20000, 50000,100000, 200000, 500000, 1000000))

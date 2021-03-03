@@ -56,14 +56,14 @@ def experiment(results_csv_file: str, auction_functions: list, auction_names: st
     :param stocks_prices: list of prices for each stock and each agent.
     :param stock_names: list of stocks names which prices are belongs, for naming only.
     """
-    TABLE_COLUMNS = ["stock_name", "recipe", "num_possible_trades", "optimal_count", "optimal_count_with_gft_zero",
-                     "optimal_gft"]
-    AUCTION_COLUMNS = ["auction_count", "count_ratio", "gft", "gft_ratio"]
+    TABLE_COLUMNS = ["stockname", "recipe", "numpossibletrades", "optimalcount", "optimalcountwithgftzero",
+                     "optimalgft"]
+    AUCTION_COLUMNS = ["auctioncount", "countratio", "gft", "gftratio"]
     print(recipe)
     if stocks_prices is None:
         (stocks_prices, stock_names) = getStocksPricesShuffled()
     column_names = TABLE_COLUMNS
-    column_names += [auction_name + '_' + column for auction_name in auction_names for column in AUCTION_COLUMNS]
+    column_names += [auction_name + column for auction_name in auction_names for column in AUCTION_COLUMNS]
     results_table = TeeTable(column_names, results_csv_file)
     recipe_str = ":".join(map(str,recipe))
     recipe_sum = sum(recipe)
@@ -81,7 +81,6 @@ def experiment(results_csv_file: str, auction_functions: list, auction_names: st
         last_iteration = False
         for num_of_agents_per_category in nums_of_agents:
             for iteration in range(iterations):
-                random.shuffle(stock_prices)
                 num_of_possible_ps = min(num_of_agents_per_category, int(len(stock_prices)/recipe_sum))
                 if last_iteration and num_of_possible_ps < num_of_agents_per_category:
                     break
@@ -105,11 +104,17 @@ def experiment(results_csv_file: str, auction_functions: list, auction_names: st
                 (optimal_trade_with_gft_zero, _) = market.optimal_trade(ps_recipe=list(recipe), max_iterations=10000000)
                 optimal_count_with_gft_zero = optimal_trade_with_gft_zero.num_of_deals()
 
-                results = [("stock_name", stock_names[i]), ("recipe", recipe_str),
-                           ("num_possible_trades", round(num_of_possible_ps)), ("optimal_count", round(optimal_count,2)),
-                           ("optimal_count_with_gft_zero", round(optimal_count_with_gft_zero,2)),
-                           ("optimal_gft", round(optimal_gft,2))]
+                results = [("stockname", stock_names[i]), ("recipe", recipe_str),
+                           ("numpossibletrades", round(num_of_possible_ps)), ("optimalcount", optimal_count),
+                           ("optimalcountwithgftzero", optimal_count_with_gft_zero),
+                           ("optimalgft", optimal_gft)]
                 for auction_index in range(len(auction_functions)):
+                    if 'mcafee' in auction_names[auction_index]:
+                        results.append((auction_name + "auctioncount", 0))
+                        results.append((auction_name + "countratio", 0))
+                        results.append((auction_name + "gft", 0))
+                        results.append((auction_name + "gftratio", 0))
+
                     auction_trade = auction_functions[auction_index](market, recipe)
                     auction_count = auction_trade.num_of_deals()
                     # for j in range(len(stocks_prices[i])):
@@ -123,11 +128,11 @@ def experiment(results_csv_file: str, auction_functions: list, auction_names: st
                         print("Auction name: ", auction_names[auction_index])
                     gft = auction_trade.gain_from_trade(including_auctioneer=False)
                     auction_name = auction_names[auction_index]
-                    results.append((auction_name + "_auction_count", round(auction_trade.num_of_deals(),2)))
-                    results.append((auction_name + "_count_ratio",
-                                    0 if optimal_count_with_gft_zero==0 else int((auction_count / optimal_count_with_gft_zero) * 100000)/1000))
-                    results.append((auction_name + "_gft", round(gft,2)))
-                    results.append((auction_name + "_gft_ratio", 0 if optimal_gft==0 else round(gft / optimal_gft*100,3)))
+                    results.append((auction_name + "auctioncount", auction_trade.num_of_deals()))
+                    results.append((auction_name + "countratio",
+                                    0 if optimal_count_with_gft_zero==0 else (auction_count / optimal_count_with_gft_zero) * 100))
+                    results.append((auction_name + "gft", gft))
+                    results.append((auction_name + "gftratio", 0 if optimal_gft==0 else gft / optimal_gft*100))
 
                 #results_table.add(OrderedDict(results))
                 if len(total_results[str(num_of_agents_per_category)]) == 0:
@@ -144,9 +149,9 @@ def experiment(results_csv_file: str, auction_functions: list, auction_names: st
             for index in range(len(results)):
                 if index > 2:
                     if 'ratio' in results[index][0]:
-                        results[index] = (results[index][0], int(results[index][1]/iterations*1000)/1000)
+                        results[index] = (results[index][0], results[index][1]/iterations)
                     else:
-                        results[index] = (results[index][0], round(results[index][1]/iterations, 1))
+                        results[index] = (results[index][0], results[index][1]/iterations)
                 #elif index == 0:
                 #    results[index] = (results[index][0], 'Average')
             results_table.add(OrderedDict(results))

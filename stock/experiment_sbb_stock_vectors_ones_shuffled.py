@@ -23,7 +23,7 @@ for num_of_seller_categories in (2,4,8,16):
                ["SBB_External_Competition", "SBB_Ascending_Prices"],
                recipe=num_of_categories*(1,),
                iterations=1000,
-               nums_of_agents = (2, 3, 4, 5, 10, 15, 25, 50, 100, 500, 1000, 2000, 5000, 10000))#, 20000, 50000,
+               nums_of_agents = (2, 3, 4, 5, 10, 15, 25, 50, 100, 500, 1000, 2000, 5000))#, 10000, 20000, 50000,
 #                                 100000, 200000, 500000, 1000000))
 
 

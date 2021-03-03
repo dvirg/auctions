@@ -151,7 +151,7 @@ class RecipeTree (NodeMixin):
     ['seller', 'producerA']
     """
 
-    def __init__(self, categories:List[AgentCategory], category_indices:List[Any]):
+    def __init__(self, categories:List[AgentCategory], category_indices:List[Any], agent_counts:List[int] = None):
         """
         :param category:
         :param parent:
@@ -160,8 +160,9 @@ class RecipeTree (NodeMixin):
         """
         if len(category_indices)%2!=0:
             raise ValueError("RecipeTree must be initialized with an even-length list, containing indices and their children.")
-
         self.num_categories = len(categories)
+        if agent_counts is None:
+            agent_counts = [1] * self.num_categories
         self_index = category_indices[0]
         children_indices = category_indices[1]
 

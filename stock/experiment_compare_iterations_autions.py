@@ -44,10 +44,11 @@ from agents import AgentCategory
 
 from tee_table.tee_table import TeeTable
 from collections import OrderedDict
-from get_stocks_data import getStocksPrices
+from get_stocks_data import getStocksPricesShuffled
+import random
 
-def experiment(results_csv_file:str, auction_functions:list, auction_names:str, recipe:tuple,
-               nums_of_agents=None, stocks_prices:list=None, stock_names:list=None):
+def experiment(results_csv_file:str, auction_functions:list, auction_names:str, recipe:tuple, nums_of_agents=None,
+               stocks_prices:list=None, stock_names:list=None, num_of_iterations=1000, run_with_stock_prices=True):
     """
     Run an experiment similar to McAfee (1992) experiment on the given auction.
     :param results_csv_file: the experiment result file.
@@ -57,75 +58,119 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
     :param stocks_prices: list of prices for each stock and each agent.
     :param stock_names: list of stocks names which prices are belongs, for naming only.
     """
-    TABLE_COLUMNS = ["stock_name", "recipe", "num_possible_trades", "optimal_count", "optimal_count_with_gft_zero",
-                     "optimal_gft", "optimal_gft_with_gft_zero"]
-    AUCTION_COLUMNS = ["count", "count_ratio", "total_gft", "total_gft_ratio",
-                       "market_gft", "market_gft_ratio"]
+    TABLE_COLUMNS = ["stockname", "recipe", "numpossibletrades", "optimalcount", "gftratioformula",
+                     "optimalcountwithgftzero", "optimalgft", "optimalgftwithgftzero"]
+    AUCTION_COLUMNS = ["count", "countratio", "totalgft", "totalgftratio",
+                       "marketgft", "marketgftratio"]
 
     if stocks_prices is None:
-        (stocks_prices, stock_names) = getStocksPrices(recipe)
+        (stocks_prices, stock_names) = getStocksPricesShuffled()
     column_names = TABLE_COLUMNS
-    column_names += [auction_name + '_' + column for auction_name in auction_names for column in AUCTION_COLUMNS]
+    column_names += [auction_name + column for auction_name in auction_names for column in AUCTION_COLUMNS]
     results_table = TeeTable(column_names, results_csv_file)
     recipe_str = ":".join(map(str,recipe))
+    recipe_sum = sum(recipe)
+    recipe_sum_for_buyer = (recipe_sum-recipe[0])/recipe[0]
     if nums_of_agents is None:
         nums_of_agents = [10000000]
+    #print(nums_of_agents)
+    total_results = {}
+    for num_of_agents_per_category in nums_of_agents:
+        total_results[str(num_of_agents_per_category)] = []
+    #print(total_results)
     for i in range(len(stocks_prices)):
-        last_iteration = False
-        for num_of_agents_per_category in nums_of_agents:
-            num_of_possible_ps = min(num_of_agents_per_category,
-                                     min([len(stocks_prices[i][j])/recipe[j] for j in range(len(stocks_prices[i]))]))
-            if last_iteration is True and num_of_possible_ps < num_of_agents_per_category:
-                break
-            if num_of_possible_ps < num_of_agents_per_category:
-                if last_iteration is True:
-                    break
-                else:
-                    last_iteration = True
-                    market = Market([AgentCategory("agent", stocks_prices[i][j]) for j in range(len(stocks_prices[i]))])
-            else:
-                market = Market([AgentCategory("agent", stocks_prices[i][j][0:num_of_possible_ps*recipe[j]]) for j in range(len(stocks_prices[i]))])
-            (optimal_trade, _) = market.optimal_trade(ps_recipe=recipe, max_iterations=10000000, include_zero_gft_ps=False)
-            optimal_count = optimal_trade.num_of_deals()
-            optimal_gft = optimal_trade.gain_from_trade()
-            (optimal_trade_with_gft_zero, _) = market.optimal_trade(ps_recipe=recipe, max_iterations=10000000)
-            optimal_count_with_gft_zero = optimal_trade_with_gft_zero.num_of_deals()
-            optimal_gft_with_gft_zero = optimal_trade_with_gft_zero.gain_from_trade()
+        stock_prices = stocks_prices[i]
+        for num_of_possible_ps in nums_of_agents:
+            for iteration in range(num_of_iterations):
+                categories = []
+                if run_with_stock_prices:
+                    while len(stock_prices) < num_of_possible_ps * recipe_sum:
+                        stock_prices = stock_prices + stock_prices
+                    random.shuffle(stock_prices)
+                    index = 0
+                    for category in recipe:
+                        next_index = index + num_of_possible_ps * category
+                        price_sign = recipe_sum_for_buyer if index == 0 else -1
+                        #price_value_multiple = -1 * buyer_agent_count if index > 0 else recipe_sum - buyer_agent_count
+                        categories.append(AgentCategory("agent", [int(price*price_sign) for price in stock_prices[index:next_index]]))
+                        index = next_index
+                else: #prices from random.
+                    for index in range(len(recipe)):
+                    #for category in recipe:
+                        min_value = -1000 if index > 0 else int(recipe_sum_for_buyer)
+                        max_value = -1 if index > 0 else int(1000 * recipe_sum_for_buyer)
+                        categories.append(AgentCategory.uniformly_random("agent", num_of_possible_ps*recipe[index],
+                                                                         min_value, max_value))
+                market = Market(categories)
+                (optimal_trade, _) = market.optimal_trade(ps_recipe=list(recipe), max_iterations=10000000, include_zero_gft_ps=False)
+                optimal_count = optimal_trade.num_of_deals()
+                optimal_gft = optimal_trade.gain_from_trade()
+                (optimal_trade_with_gft_zero, _) = market.optimal_trade(ps_recipe=list(recipe), max_iterations=10000000)
+                optimal_count_with_gft_zero = optimal_trade_with_gft_zero.num_of_deals()
+                optimal_gft_with_gft_zero = optimal_trade_with_gft_zero.gain_from_trade()
 
-            results = [("stock_name", stock_names[i]), ("recipe", recipe_str),
-                       ("num_possible_trades", round(num_of_possible_ps)), ("optimal_count", round(optimal_count,2)),
-                       ("optimal_count_with_gft_zero", round(optimal_count_with_gft_zero,2)),
-                       ("optimal_gft", round(optimal_gft,2)),
-                       ("optimal_gft_with_gft_zero", round(optimal_gft_with_gft_zero,2))]
-            for auction_index in range(len(auction_functions)):
-                auction_trade = auction_functions[auction_index](market, recipe)
-                count = auction_trade.num_of_deals()
-                if(auction_names[auction_index] == "SBB_External_Competition" and auction_trade.num_of_deals() > optimal_trade.num_of_deals()):
-                    print("Warning!!! the number of deals in action is greater than optimal!")
-                    print("Optimal num of deals: ", optimal_trade.num_of_deals())
-                    print("Auction num of deals: ", auction_trade.num_of_deals())
-                    print("Auction name: ", auction_names[auction_index])
-                total_gft = auction_trade.gain_from_trade(including_auctioneer=True)
-                market_gft = auction_trade.gain_from_trade(including_auctioneer=False)
-                auction_name = auction_names[auction_index]
-                results.append((auction_name + "_count", round(auction_trade.num_of_deals(),2)))
-                if auction_names[auction_index] != "SBB_External_Competition":
-                    results.append((auction_name + "_count_ratio",
-                                    0 if optimal_count==0 else int((count / optimal_count_with_gft_zero) * 100000)/1000))
-                    results.append((auction_name + "_total_gft", round(total_gft,2)))
-                    results.append((auction_name + "_total_gft_ratio", 0 if optimal_gft==0 else round(total_gft / optimal_gft_with_gft_zero*100,3)))
-                    results.append((auction_name + "_market_gft", round(market_gft, 2)))
-                    results.append((auction_name + "_market_gft_ratio",
-                                    0 if optimal_gft == 0 else round(market_gft / optimal_gft_with_gft_zero * 100, 3)))
-                else:
-                    results.append((auction_name + "_count_ratio",
-                                    0 if optimal_count==0 else int((count / optimal_count) * 100000)/1000))
-                    results.append((auction_name + "_total_gft", round(total_gft,2)))
-                    results.append((auction_name + "_total_gft_ratio", 0 if optimal_gft==0 else round(total_gft / optimal_gft*100,3)))
-                    results.append((auction_name + "_market_gft", round(market_gft, 2)))
-                    results.append((auction_name + "_market_gft_ratio",
-                                    0 if optimal_gft == 0 else round(market_gft / optimal_gft * 100, 3)))
+                results = [("stockname", stock_names[i]),
+                           ("recipe", recipe_str),
+                           ("numpossibletrades", int(num_of_possible_ps)),
+                           ("optimalcount", optimal_count),
+                           ("gftratioformula", (optimal_count - 1) * 100 / (optimal_count if min(recipe) == max(recipe) and recipe[0] == 1 else optimal_count + 1) if optimal_count > 1 else 0),
+                           ("optimalcountwithgftzero", optimal_count_with_gft_zero),
+                           ("optimalgft", optimal_gft),
+                           ("optimalgftwithgftzero", optimal_gft_with_gft_zero)]
+                for auction_index in range(len(auction_functions)):
+                    auction_trade = auction_functions[auction_index](market, recipe)
+                    count = auction_trade.num_of_deals()
+                    total_gft = auction_trade.gain_from_trade(including_auctioneer=True)
+                    market_gft = auction_trade.gain_from_trade(including_auctioneer=False)
+                    auction_name = auction_names[auction_index]
+                    results.append((auction_name + "count", auction_trade.num_of_deals()))
+                    if auction_names[auction_index] != "SBBExternalCompetition":
+                        results.append((auction_name + "countratio",
+                                        0 if optimal_count==0 else (count / optimal_count_with_gft_zero) * 100))
+                        results.append((auction_name + "totalgft", total_gft))
+                        results.append((auction_name + "totalgftratio", 0 if optimal_gft==0 else total_gft / optimal_gft_with_gft_zero*100))
+                        results.append((auction_name + "marketgft", market_gft))
+                        results.append((auction_name + "marketgftratio",
+                                        0 if optimal_gft == 0 else market_gft / optimal_gft_with_gft_zero * 100))
+                    else:
+                        results.append((auction_name + "countratio",
+                                        0 if optimal_count==0 else (count / optimal_count) * 100))
+                        results.append((auction_name + "totalgft", total_gft))
+                        results.append((auction_name + "totalgftratio", 0 if optimal_gft==0 else total_gft / optimal_gft*100))
+                        results.append((auction_name + "marketgft", market_gft))
+                        results.append((auction_name + "marketgftratio",
+                                        0 if optimal_gft == 0 else market_gft / optimal_gft * 100))
 
-            results_table.add(OrderedDict(results))
+                #results_table.add(OrderedDict(results))
+                #print(results)
+                if len(total_results[str(num_of_possible_ps)]) == 0:
+                    total_results[str(num_of_possible_ps)] = results[0:len(results)]
+                else:
+                    sum_result = total_results[str(num_of_possible_ps)]
+                    for index in range(len(results)):
+                        if index > 2:
+                            sum_result[index] = (results[index][0], sum_result[index][1] + results[index][1])
+            #print(total_results)
+        print(stock_names[i], end=',')
+        #break
+    print()
+    division_number = num_of_iterations * len(stocks_prices)
+    #division_number = num_of_iterations
+    for num_of_possible_ps in nums_of_agents:
+        results = total_results[str(num_of_possible_ps)]
+        for index in range(len(results)):
+            if 'gftratio' in results[index][0]:
+                results[index] = (results[index][0], padding_zeroes(results[index][1] / division_number, 3))
+            elif index > 2:
+                results[index] = (results[index][0], padding_zeroes(results[index][1] / division_number, 2))
+            elif index == 0:
+                results[index] = (results[index][0], 'Average')
+        #print(results)
+        results_table.add(OrderedDict(results))
     results_table.done()
 
+
+def padding_zeroes(result, num_digits:int):
+    str_result = str(result)
+    str_result += ("0" * num_digits) if '.' in str_result else '.' + ("0" * num_digits)
+    return str_result[0 : str_result.index('.') + num_digits + 1]

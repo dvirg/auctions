@@ -11,11 +11,12 @@ import pandas as pd
 from os import listdir
 from os.path import isfile, join
 import random
-STOCKS = join('stock','stocks')
+STOCKS = join('stock', 'stocks')
 POSITIVE_TYPES = ['High', 'Close']
 NEGATIVE_TYPES = ['Open', 'Low']
 TYPES = [*POSITIVE_TYPES, *NEGATIVE_TYPES]
-
+keep_all_prices = {}
+STOCKS = 'C:\\Users\\dg1813\\Documents\\GitHub\\auctions\\stock\\stocks'
 
 def getPrices(stockFile:str, recipe:tuple):
     df = pd.read_csv(stockFile)
@@ -60,7 +61,9 @@ def getPrices(stockFile:str, recipe:tuple):
             #     data[i][j] = (int(data[i][j]*10000))/10000
     return long_data
 
-def getAllPricesShuffled(stockFile:str):
+def getAllPricesShuffled(stockFile:str, stockName):
+    if stockName in keep_all_prices:
+        return keep_all_prices[stockName]
     df = pd.read_csv(stockFile)
     data = [df[type].to_numpy() for type in TYPES]
     long_data = []
@@ -68,13 +71,15 @@ def getAllPricesShuffled(stockFile:str):
         for j in range(len(data[i])):
             long_data.append(int(data[i][j]*1000))
     random.shuffle(long_data)
+    keep_all_prices[stockName] = long_data
+    random.shuffle(long_data)
     return long_data
 
 #print(getAllPricesShuffled(join('stocks\\A.csv')))
 
 def getStocksPricesShuffled():
     onlyfiles = [f for f in listdir(STOCKS) if isfile(join(STOCKS, f))]
-    return [getAllPricesShuffled(join(STOCKS, stockFile)) for stockFile in onlyfiles], [f[0:-4] for f in onlyfiles]
+    return [getAllPricesShuffled(join(STOCKS, stockFile), stockFile[0:-4]) for stockFile in onlyfiles], [f[0:-4] for f in onlyfiles]
 #print(getStocksPricesShuffled())
 def getStocksPrices(recipe:tuple):
     onlyfiles = [f for f in listdir(STOCKS) if isfile(join(STOCKS, f))]
