@@ -140,6 +140,7 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
                         results.append((auction_name + "marketgft", market_gft))
                         results.append((auction_name + "marketgftratio",
                                         0 if optimal_gft == 0 else market_gft / optimal_gft * 100))
+                #TODO: in here we need to check which auction did better and print the market and their results.
 
                 #results_table.add(OrderedDict(results))
                 #print(results)

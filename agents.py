@@ -118,6 +118,12 @@ class AgentCategory:
         values = [random.uniform(min_value,max_value) for _ in range(num_of_agents)]
         return AgentCategory(name, values)
 
+    @staticmethod
+    def non_uniformly_random(name:str, num_of_agents:int, min_value:float, max_value:float):
+        import random
+        values = [random.uniform(min_value,max_value) for _ in range(num_of_agents)]
+        return AgentCategory(name, values)
+
 
 class EmptyCategoryException(Exception):
     pass

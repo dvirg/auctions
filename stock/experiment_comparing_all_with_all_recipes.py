@@ -24,7 +24,7 @@ sbb_names = ["SBBExternalCompetition", "SBBAscendingPrices"]
 sbb_functions = [budget_balanced_trade_reduction, budget_balanced_ascending_auction]
 mcafee_functions = [mcafee_trade_reduction, mcafee_without_heuristic]
 mcafee_names = ["McAfee", "McAfeeWithoutHeuristic"]
-num_of_iterations = 1000
+num_of_iterations = 1000#
 
 experiment("results/experiment_comparing_mcafee_to_sbb_stock.csv",
            mcafee_functions + sbb_functions,
@@ -61,7 +61,7 @@ for num_of_seller_categories in (2,4,8,16):
                num_of_iterations=num_of_iterations)
 
 for num_of_seller_categories in (2,4,8,16):
-    experiment("results/experiment_sbb_with_vectors_of_multi_stock_1_" + str(num_of_seller_categories) + ".csv",
+    experiment("results/experiment_sbb_with_vectors_of_multi_stock_(1," + str(num_of_seller_categories) + ").csv",
                sbb_functions,
                sbb_names,
                recipe=(1, num_of_seller_categories),
@@ -69,7 +69,7 @@ for num_of_seller_categories in (2,4,8,16):
                num_of_iterations=num_of_iterations)
 
 for num_of_seller_categories in (2,4,8,16):
-    experiment("results/experiment_sbb_with_vectors_of_multi_random_1_" + str(num_of_seller_categories) + ".csv",
+    experiment("results/experiment_sbb_with_vectors_of_multi_random_(1," + str(num_of_seller_categories) + ").csv",
                sbb_functions,
                sbb_names,
                recipe=(1, num_of_seller_categories),
@@ -83,8 +83,7 @@ recipes = [(2,2), (2,3), (3,3),
            (1,2,3,4), (4,3,2,1)]
 recipes = []
 for recipe in recipes:
-    experiment("results/experiment_sbb_with_vectors_of_multi_stock_" + str(recipe)
-               .replace('(','_').replace(')','_').replace(', ','_') + ".csv",
+    experiment("results/experiment_sbb_with_vectors_of_multi_stock_" + str(recipe) + ".csv",
                sbb_functions,
                sbb_names,
                recipe=recipe,
@@ -92,8 +91,7 @@ for recipe in recipes:
                num_of_iterations=num_of_iterations)
 
 for recipe in recipes:
-    experiment("results/experiment_sbb_with_vectors_of_multi_random_" + str(recipe)
-               .replace('(','_').replace(')','_').replace(', ','_') + ".csv",
+    experiment("results/experiment_sbb_with_vectors_of_multi_random_" + str(recipe) + ".csv",
                sbb_functions,
                sbb_names,
                recipe=recipe,
