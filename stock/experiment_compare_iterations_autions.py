@@ -97,8 +97,8 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
                 else: #prices from random.
                     for index in range(len(recipe)):
                     #for category in recipe:
-                        min_value = -1000 if index > 0 else int(recipe_sum_for_buyer)
-                        max_value = -1 if index > 0 else int(1000 * recipe_sum_for_buyer)
+                        min_value = -100000 if index > 0 else recipe_sum_for_buyer
+                        max_value = -1 if index > 0 else 100000 * recipe_sum_for_buyer
                         categories.append(AgentCategory.uniformly_random("agent", num_of_possible_ps*recipe[index],
                                                                          min_value, max_value))
                 market = Market(categories)
@@ -141,7 +141,33 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
                         results.append((auction_name + "marketgftratio",
                                         0 if optimal_gft == 0 else market_gft / optimal_gft * 100))
                 #TODO: in here we need to check which auction did better and print the market and their results.
-
+                if True:
+                    gft_to_compare = -1
+                    k_to_compare = -1
+                    for (label, value) in results:
+                        gft_found = False
+                        k_found = False
+                        if 'SBB' in label:
+                            if gft_found is False and label.endswith('totalgft'):
+                                if gft_to_compare < 0:
+                                    gft_to_compare = value
+                                elif gft_to_compare != value:
+                                    with open('diff_in_mechanisms_gft2.txt', 'a') as f:
+                                        f.write('There is diff in gft between two auctions: ' + str(gft_to_compare) + ' ' + str(value) + '\n')
+                                        f.write(str(results) + '\n')
+                                        if num_of_possible_ps < 10:
+                                            f.write(str(market) + '\n')
+                                    gft_found = True
+                            elif k_found is False and label.endswith('count'):
+                                if k_to_compare < 0:
+                                    k_to_compare = value
+                                elif k_to_compare != value:
+                                    with open('diff_in_mechanisms_k2.txt', 'a') as f:
+                                        f.write('There is diff in gft between two auctions: ' + str(k_to_compare) + ' ' + str(value) + '\n')
+                                        f.write(str(results) + '\n')
+                                        if num_of_possible_ps < 10:
+                                            f.write(str(market) + '\n')
+                                    k_found = True
                 #results_table.add(OrderedDict(results))
                 #print(results)
                 if len(total_results[str(num_of_possible_ps)]) == 0:

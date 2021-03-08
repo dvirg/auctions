@@ -24,8 +24,29 @@ sbb_names = ["SBBExternalCompetition", "SBBAscendingPrices"]
 sbb_functions = [budget_balanced_trade_reduction, budget_balanced_ascending_auction]
 mcafee_functions = [mcafee_trade_reduction, mcafee_without_heuristic]
 mcafee_names = ["McAfee", "McAfeeWithoutHeuristic"]
-num_of_iterations = 1000#
+num_of_iterations = 100#0#
+recipes = [(4,3,2,1), (3,2,1), (2,1), (2,2), (2,3), (3,3),
+           (1,2,2), (2,2,2), (1,2,3), (4,2,6),
+           (1,2,3,4)]
+#recipes = []
+for recipe in recipes:
+    experiment("results/experiment_sbb_with_vectors_of_multi_stock_" + str(recipe).replace(' ', '') + ".csv",
+               sbb_functions,
+               sbb_names,
+               recipe=recipe,
+               nums_of_agents=nums_of_agents,
+               num_of_iterations=num_of_iterations)
 
+    experiment("results/experiment_sbb_with_vectors_of_multi_random_" + str(recipe).replace(' ', '') + ".csv",
+               sbb_functions,
+               sbb_names,
+               recipe=recipe,
+               nums_of_agents=nums_of_agents,
+               run_with_stock_prices=False,
+               num_of_iterations=num_of_iterations)
+
+if False:
+    exit(0)
 experiment("results/experiment_comparing_mcafee_to_sbb_stock.csv",
            mcafee_functions + sbb_functions,
            mcafee_names + sbb_names,
@@ -50,8 +71,6 @@ for num_of_seller_categories in (2,4,8,16):
                nums_of_agents = nums_of_agents,
                num_of_iterations=num_of_iterations)
 
-for num_of_seller_categories in (2,4,8,16):
-    num_of_categories = num_of_seller_categories+1
     experiment("results/experiment_sbb_with_vectors_of_ones_random_shuffled_" + str(num_of_categories) + '.csv',
                sbb_functions,
                sbb_names,
@@ -68,7 +87,6 @@ for num_of_seller_categories in (2,4,8,16):
                nums_of_agents=nums_of_agents,
                num_of_iterations=num_of_iterations)
 
-for num_of_seller_categories in (2,4,8,16):
     experiment("results/experiment_sbb_with_vectors_of_multi_random_(1," + str(num_of_seller_categories) + ").csv",
                sbb_functions,
                sbb_names,
@@ -77,25 +95,4 @@ for num_of_seller_categories in (2,4,8,16):
                run_with_stock_prices=False,
                num_of_iterations=num_of_iterations)
 
-
-recipes = [(2,2), (2,3), (3,3),
-           (1,2,2), (2,2,2), (1,2,3), (4,2,6),
-           (1,2,3,4), (4,3,2,1)]
-recipes = []
-for recipe in recipes:
-    experiment("results/experiment_sbb_with_vectors_of_multi_stock_" + str(recipe) + ".csv",
-               sbb_functions,
-               sbb_names,
-               recipe=recipe,
-               nums_of_agents=nums_of_agents,
-               num_of_iterations=num_of_iterations)
-
-for recipe in recipes:
-    experiment("results/experiment_sbb_with_vectors_of_multi_random_" + str(recipe) + ".csv",
-               sbb_functions,
-               sbb_names,
-               recipe=recipe,
-               nums_of_agents=nums_of_agents,
-               run_with_stock_prices=False,
-               num_of_iterations=num_of_iterations)
 

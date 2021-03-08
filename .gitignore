@@ -104,3 +104,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 *.xlsx
+stock/diff_in_mechanisms.txt
+stock/diff_in_mechanisms_gft.txt
+stock/diff_in_mechanisms_gft2.txt

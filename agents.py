@@ -115,13 +115,25 @@ class AgentCategory:
     @staticmethod
     def uniformly_random(name:str, num_of_agents:int, min_value:float, max_value:float):
         import random
-        values = [random.uniform(min_value,max_value) for _ in range(num_of_agents)]
+        values = [round(random.uniform(min_value,max_value)) for _ in range(num_of_agents)]
         return AgentCategory(name, values)
 
     @staticmethod
-    def non_uniformly_random(name:str, num_of_agents:int, min_value:float, max_value:float):
+    def normalvariate_random(name: str, num_of_agents: int, sign_multiple: float, mu, sigma):
         import random
-        values = [random.uniform(min_value,max_value) for _ in range(num_of_agents)]
+        values = [round(sign_multiple * abs(random.normalvariate(mu, sigma))) for _ in range(num_of_agents)]
+        return AgentCategory(name, values)
+
+    @staticmethod
+    def gammavariate_random(name: str, num_of_agents: int, sign_multiple: float, alpha, beta):
+        import random
+        values = [round(sign_multiple * abs(random.gammavariate(alpha, beta))) for _ in range(num_of_agents)]
+        return AgentCategory(name, values)
+
+    @staticmethod
+    def paretovariate_random(name: str, num_of_agents: int, sign_multiple: float, alpha):
+        import random
+        values = [round(sign_multiple * abs(random.paretovariate(alpha))) for _ in range(num_of_agents)]
         return AgentCategory(name, values)
 
 
