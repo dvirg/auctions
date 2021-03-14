@@ -24,9 +24,9 @@ sbb_names = ["SBBExternalCompetition", "SBBAscendingPrices"]
 sbb_functions = [budget_balanced_trade_reduction, budget_balanced_ascending_auction]
 mcafee_functions = [mcafee_trade_reduction, mcafee_without_heuristic]
 mcafee_names = ["McAfee", "McAfeeWithoutHeuristic"]
-num_of_iterations = 100#0#
+num_of_iterations = 1000#
 recipes = [(4,3,2,1), (3,2,1), (2,1), (2,2), (2,3), (3,3),
-           (1,2,2), (2,2,2), (1,2,3), (4,2,6),
+           #(1,2,2), (2,2,2), (1,2,3), (4,2,6),
            (1,2,3,4)]
 #recipes = []
 for recipe in recipes:

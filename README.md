@@ -1,20 +1,16 @@
-# Ascending-Price Mechanism for General Multi-Sided Markets
+# SBB Mechanisms for Multi-Sided Markets of Single Recipe of Integers
 
 The algorithms in this folder are explained in the papers
 
 > Dvir Gilor, Rica Gonen and Erel Segal-Halevi,
-> "scending-Price Mechanism for General Multi-Sided Markets",
-> Proceedings of IJCAI 2021.
+> "Strongly Budget Balanced Auctions for Multi-Sided Markets",
+> Proceedings of AIJ 2021.
 
 
 To run the examples from the paper, try one of the following.
 
-Ascending-Price auction on recipe-tree demo:
+Running all experiments described in experiments section (5):
 
-    python ascending_auction_recipetree_demo.py
+    python stock/experiment_comparing_all_with_all_recipes.py
     
-Ascending-prices auction in experiments Section (6):
-        
-    python experiment_recpietree.py
-    
-Example results can be found in the `results/` folder.
+Example results can be found in the `stock/results/` folder.

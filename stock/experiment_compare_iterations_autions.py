@@ -48,7 +48,8 @@ from get_stocks_data import getStocksPricesShuffled
 import random
 
 def experiment(results_csv_file:str, auction_functions:list, auction_names:str, recipe:tuple, nums_of_agents=None,
-               stocks_prices:list=None, stock_names:list=None, num_of_iterations=1000, run_with_stock_prices=True):
+               stocks_prices:list=None, stock_names:list=None, num_of_iterations=1000, run_with_stock_prices=True,
+               report_diff=False):
     """
     Run an experiment similar to McAfee (1992) experiment on the given auction.
     :param results_csv_file: the experiment result file.
@@ -58,7 +59,7 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
     :param stocks_prices: list of prices for each stock and each agent.
     :param stock_names: list of stocks names which prices are belongs, for naming only.
     """
-    TABLE_COLUMNS = ["stockname", "recipe", "numpossibletrades", "optimalcount", "gftratioformula",
+    TABLE_COLUMNS = ["iterations", "stockname", "recipe", "numpossibletrades", "optimalcount", "gftratioformula",
                      "optimalcountwithgftzero", "optimalgft", "optimalgftwithgftzero"]
     AUCTION_COLUMNS = ["count", "countratio", "totalgft", "totalgftratio",
                        "marketgft", "marketgftratio"]
@@ -109,7 +110,8 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
                 optimal_count_with_gft_zero = optimal_trade_with_gft_zero.num_of_deals()
                 optimal_gft_with_gft_zero = optimal_trade_with_gft_zero.gain_from_trade()
 
-                results = [("stockname", stock_names[i]),
+                results = [("iterations", num_of_iterations),
+                           ("stockname", stock_names[i]),
                            ("recipe", recipe_str),
                            ("numpossibletrades", int(num_of_possible_ps)),
                            ("optimalcount", optimal_count),
@@ -140,13 +142,13 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
                         results.append((auction_name + "marketgft", market_gft))
                         results.append((auction_name + "marketgftratio",
                                         0 if optimal_gft == 0 else market_gft / optimal_gft * 100))
-                #TODO: in here we need to check which auction did better and print the market and their results.
-                if True:
+                #We check which auction did better and print the market and their results.
+                if report_diff:
                     gft_to_compare = -1
                     k_to_compare = -1
+                    gft_found = False
+                    k_found = False
                     for (label, value) in results:
-                        gft_found = False
-                        k_found = False
                         if 'SBB' in label:
                             if gft_found is False and label.endswith('totalgft'):
                                 if gft_to_compare < 0:
@@ -175,7 +177,7 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
                 else:
                     sum_result = total_results[str(num_of_possible_ps)]
                     for index in range(len(results)):
-                        if index > 2:
+                        if index > 3:
                             sum_result[index] = (results[index][0], sum_result[index][1] + results[index][1])
             #print(total_results)
         print(stock_names[i], end=',')
@@ -188,9 +190,9 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
         for index in range(len(results)):
             if 'gftratio' in results[index][0]:
                 results[index] = (results[index][0], padding_zeroes(results[index][1] / division_number, 3))
-            elif index > 2:
+            elif index > 3:
                 results[index] = (results[index][0], padding_zeroes(results[index][1] / division_number, 2))
-            elif index == 0:
+            elif index == 1:
                 results[index] = (results[index][0], 'Average')
         #print(results)
         results_table.add(OrderedDict(results))
