@@ -1,6 +1,6 @@
 # SBB Mechanisms for Multi-Sided Markets of Single Recipe of Integers
 
-The algorithms in this folder are explained in the papers
+The algorithms in this folder are explained in the paper:
 
 > Dvir Gilor, Rica Gonen and Erel Segal-Halevi,
 > "Strongly Budget Balanced Auctions for Multi-Sided Markets",
@@ -9,7 +9,7 @@ The algorithms in this folder are explained in the papers
 
 To run the examples from the paper, try one of the following.
 
-Running all experiments described in experiments section (5):
+Running all experiments described in experiments' section (5):
 
     python stock/experiment_comparing_all_with_all_recipes.py
     
