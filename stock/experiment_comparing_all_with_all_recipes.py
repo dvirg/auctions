@@ -24,10 +24,10 @@ sbb_names = ["SBBExternalCompetition", "SBBAscendingPrices"]
 sbb_functions = [budget_balanced_trade_reduction, budget_balanced_ascending_auction]
 mcafee_functions = [mcafee_trade_reduction, mcafee_without_heuristic]
 mcafee_names = ["McAfee", "McAfeeWithoutHeuristic"]
-num_of_iterations = 1000#
+num_of_iterations = 30#3
 recipes = [(4,3,2,1), (3,2,1), (2,1), (2,2), (2,3), (3,3),
-           #(1,2,2), (2,2,2), (1,2,3), (4,2,6),
-           (1,2,3,4)]
+           (3,2,2), (2,2,2), (1,2,3), (4,2,6),
+           (10,2,3,4)]
 #recipes = []
 for recipe in recipes:
     experiment("results/experiment_sbb_with_vectors_of_multi_stock_" + str(recipe).replace(' ', '') + ".csv",

@@ -46,6 +46,7 @@ from tee_table.tee_table import TeeTable
 from collections import OrderedDict
 from get_stocks_data import getStocksPricesShuffled
 import random
+from os import path
 
 def experiment(results_csv_file:str, auction_functions:list, auction_names:str, recipe:tuple, nums_of_agents=None,
                stocks_prices:list=None, stock_names:list=None, num_of_iterations=1000, run_with_stock_prices=True,
@@ -62,8 +63,14 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
     TABLE_COLUMNS = ["iterations", "stockname", "recipe", "numpossibletrades", "optimalcount", "gftratioformula",
                      "optimalcountwithgftzero", "optimalgft", "optimalgftwithgftzero"]
     AUCTION_COLUMNS = ["count", "countratio", "totalgft", "totalgftratio",
+                       "withoutgftzerocountratio", "withoutgftzerototalgft", "withoutgftzerototalgftratio",
                        "marketgft", "marketgftratio"]
 
+    if path.exists(results_csv_file):
+        print('The file', results_csv_file, 'already exists, skipping')
+        return
+    else:
+        print('Running for the file', results_csv_file)
     if stocks_prices is None:
         (stocks_prices, stock_names) = getStocksPricesShuffled()
     column_names = TABLE_COLUMNS
@@ -126,22 +133,18 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
                     market_gft = auction_trade.gain_from_trade(including_auctioneer=False)
                     auction_name = auction_names[auction_index]
                     results.append((auction_name + "count", auction_trade.num_of_deals()))
-                    if auction_names[auction_index] != "SBBExternalCompetition":
-                        results.append((auction_name + "countratio",
-                                        0 if optimal_count==0 else (count / optimal_count_with_gft_zero) * 100))
-                        results.append((auction_name + "totalgft", total_gft))
-                        results.append((auction_name + "totalgftratio", 0 if optimal_gft==0 else total_gft / optimal_gft_with_gft_zero*100))
-                        results.append((auction_name + "marketgft", market_gft))
-                        results.append((auction_name + "marketgftratio",
-                                        0 if optimal_gft == 0 else market_gft / optimal_gft_with_gft_zero * 100))
-                    else:
-                        results.append((auction_name + "countratio",
-                                        0 if optimal_count==0 else (count / optimal_count) * 100))
-                        results.append((auction_name + "totalgft", total_gft))
-                        results.append((auction_name + "totalgftratio", 0 if optimal_gft==0 else total_gft / optimal_gft*100))
-                        results.append((auction_name + "marketgft", market_gft))
-                        results.append((auction_name + "marketgftratio",
-                                        0 if optimal_gft == 0 else market_gft / optimal_gft * 100))
+
+                    results.append((auction_name + "countratio",
+                                    0 if optimal_count==0 else (count / optimal_count_with_gft_zero) * 100))
+                    results.append((auction_name + "totalgft", total_gft))
+                    results.append((auction_name + "totalgftratio", 0 if optimal_gft==0 else total_gft / optimal_gft_with_gft_zero*100))
+                    results.append((auction_name + "marketgft", market_gft))
+                    results.append((auction_name + "marketgftratio",
+                                    0 if optimal_gft == 0 else market_gft / optimal_gft_with_gft_zero * 100))
+                    results.append((auction_name + "withoutgftzerocountratio",
+                                    0 if optimal_count==0 else (count / optimal_count) * 100))
+                    results.append((auction_name + "withoutgftzerototalgft", total_gft))
+                    results.append((auction_name + "withoutgftzerototalgftratio", 0 if optimal_gft==0 else total_gft / optimal_gft*100))
                 #We check which auction did better and print the market and their results.
                 if report_diff:
                     gft_to_compare = -1
@@ -154,7 +157,7 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
                                 if gft_to_compare < 0:
                                     gft_to_compare = value
                                 elif gft_to_compare != value:
-                                    with open('diff_in_mechanisms_gft2.txt', 'a') as f:
+                                    with open('diff_in_sbbs_gft.txt', 'a') as f:
                                         f.write('There is diff in gft between two auctions: ' + str(gft_to_compare) + ' ' + str(value) + '\n')
                                         f.write(str(results) + '\n')
                                         if num_of_possible_ps < 10:
@@ -164,7 +167,35 @@ def experiment(results_csv_file:str, auction_functions:list, auction_names:str, 
                                 if k_to_compare < 0:
                                     k_to_compare = value
                                 elif k_to_compare != value:
-                                    with open('diff_in_mechanisms_k2.txt', 'a') as f:
+                                    with open('diff_in_sbbs_k.txt', 'a') as f:
+                                        f.write('There is diff in gft between two auctions: ' + str(k_to_compare) + ' ' + str(value) + '\n')
+                                        f.write(str(results) + '\n')
+                                        if num_of_possible_ps < 10:
+                                            f.write(str(market) + '\n')
+                                    k_found = True
+                compare_sbbs = True
+                if compare_sbbs:
+                    gft_to_compare = -1
+                    k_to_compare = -1
+                    gft_found = False
+                    k_found = False
+                    for (label, value) in results:
+                        if 'SBB' in label:
+                            if gft_found is False and label.endswith('totalgft'):
+                                if gft_to_compare < 0:
+                                    gft_to_compare = value
+                                elif gft_to_compare > value:
+                                    with open('diff_in_sbbs_gft.txt', 'a') as f:
+                                        f.write('There is diff in gft between two auctions: ' + str(gft_to_compare) + ' ' + str(value) + '\n')
+                                        f.write(str(results) + '\n')
+                                        if num_of_possible_ps < 10:
+                                            f.write(str(market) + '\n')
+                                    gft_found = True
+                            elif k_found is False and label.endswith('count'):
+                                if k_to_compare < 0:
+                                    k_to_compare = value
+                                elif k_to_compare > value:
+                                    with open('diff_in_sbbs_k.txt', 'a') as f:
                                         f.write('There is diff in gft between two auctions: ' + str(k_to_compare) + ' ' + str(value) + '\n')
                                         f.write(str(results) + '\n')
                                         if num_of_possible_ps < 10:
