@@ -34,9 +34,10 @@ class AscendingPriceVector:
     Represents a vector of prices - one price for each category of agents.
     The vector is used in ascending-prices auctions: the price can be increased until the price-sum hits zero.
     """
-    def __init__(self, ps_recipe:list, initial_price):
+    def __init__(self, ps_recipe:list, initial_price, agent_counts:list[int]=None):
         self.num_categories = len(ps_recipe)
         self.ps_recipe = ps_recipe
+        self.agent_counts = agent_counts if agent_counts else [1] * len(ps_recipe)
         self.prices = initial_price if isinstance(initial_price,list) else [initial_price] * self.num_categories
         self.status = None  # status of the latest price-increase operation. Of type PriceStatus.
 
@@ -47,10 +48,10 @@ class AscendingPriceVector:
         self.prices[category_index] = new_price
 
     def price_sum(self):
-        return dot(self.prices, self.ps_recipe)
+        return dot(dot(self.prices, self.ps_recipe), self.agent_counts)
 
     def price_sum_without_category(self, category_index:int):
-        return self.price_sum() - self.ps_recipe[category_index]*self.prices[category_index]
+        return self.price_sum() - self.ps_recipe[category_index]*self.prices[category_index] * self.agent_counts[category_index]
 
     def price_sum_after_increase(self, category_index:int, new_price:float):
         """
@@ -62,7 +63,7 @@ class AscendingPriceVector:
         >>> p.price_sum_after_increase(0, 10)
         -1990
         """
-        return self.price_sum_without_category(category_index) + self.ps_recipe[category_index]*new_price
+        return self.price_sum_without_category(category_index) + self.ps_recipe[category_index]*new_price * self.agent_counts[category_index]
 
     def increase_price_up_to_balance(self, category_index:int, new_price:float, description:str, sum_upper_bound:float=0):
         """
@@ -130,7 +131,7 @@ class SimultaneousAscendingPriceVectors:
     >>> str(pv)
     '[-10000.0, -20000.0, -10000.0, -10000.0] None'
     """
-    def __init__(self, ps_recipes: List[List[int]], initial_price_sum:float):
+    def __init__(self, ps_recipes: List[List[int]], initial_price_sum:float, agent_counts:List[int]=None):
         if len(ps_recipes)==0:
             raise ValueError("Empty list of recipes")
 
@@ -139,8 +140,9 @@ class SimultaneousAscendingPriceVectors:
             if len(ps_recipe) != num_categories:
                 raise ValueError("Different category counts: {} vs {}".format(num_categories, len(ps_recipe)))
         self.num_categories = num_categories
+        self.agent_counts = agent_counts if agent_counts else [1] * num_categories
 
-        initial_prices = calculate_initial_prices(ps_recipes, initial_price_sum)
+        initial_prices = calculate_initial_prices(ps_recipes, initial_price_sum, self.agent_counts)
 
         self.ps_recipes = ps_recipes
         self.vector = AscendingPriceVector(ps_recipes[0], initial_prices)
@@ -237,7 +239,7 @@ class SimultaneousAscendingPriceVectors:
 
 
 
-def calculate_initial_prices(ps_recipes:List[int], max_price_per_category:float)->List[float]:
+def calculate_initial_prices(ps_recipes:List[int], max_price_per_category:float, agent_counts:List[int]=None)->List[float]:
     """
     Calculate a vector of initial prices such that
        (a) the sum of prices in all recipes is the same
@@ -259,9 +261,19 @@ def calculate_initial_prices(ps_recipes:List[int], max_price_per_category:float)
     """
     num_recipes = len(ps_recipes)
     num_categories = len(ps_recipes[0])
+    agent_counts = agent_counts if agent_counts else [1] * num_categories
 
     from scipy.optimize import linprog
     # variables: 0 (the sum);  1, ..., num_categories-1 [the prices)
+    weighted_depths = []
+    for recipe in ps_recipes:
+        weighted_depths.append(sum(dot(recipe, agent_counts)))
+    max_weighted_depth = max(weighted_depths)
+
+    for i in range(len(ps_recipes)):
+        recipe = ps_recipes[i]
+
+
     result = linprog(
         [-1] + [0]*num_categories,  # Maximize the (negative) sum of prices
         A_eq=[ [-1] + recipe for recipe in ps_recipes],  # The sum of prices should equal the sum in each recipe
