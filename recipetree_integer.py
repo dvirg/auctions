@@ -37,7 +37,7 @@ class RecipeTree (NodeMixin):
     >>> producerB = AgentCategory("producerB", [-2, -4, -6, -8])
     >>> categories = [buyer, seller, producerA, producerB]  # Indices: 0, 1, 2, 3
 
-    >>> tree = RecipeTree(categories, [0, None])  # buyer
+    >>> tree = RecipeTree(categories, {'index': 0, 'count': 1, 'children': []})  # buyer
     >>> tree.combined_values()
     [60, 40, 20, -30]
     >>> tree.combined_values_detailed()
@@ -151,29 +151,35 @@ class RecipeTree (NodeMixin):
     ['seller', 'producerA']
     """
 
-    def __init__(self, categories:List[AgentCategory], category_indices:List[Any], agent_counts:List[int] = None):
+    def is_legal_object_recipe_tree(self, object_recipe_tree):
+        if 'index' not in object_recipe_tree or object_recipe_tree['index'] != int(object_recipe_tree['index']):
+            raise ValueError("RecipeTree must be initialized containing 'index' of integer category index.")
+        if 'count' not in object_recipe_tree or object_recipe_tree['count'] != int(object_recipe_tree['count']):
+            raise ValueError("RecipeTree must be initialized containing 'count' of integer agent count.")
+        if 'children' not in object_recipe_tree or not isinstance(object_recipe_tree['children'], list):
+            raise ValueError("RecipeTree must be initialized containing 'children' of list instance with category children.")
+        return True
+
+    def __init__(self, categories:List[AgentCategory], object_recipe_tree):
         """
         :param category:
         :param parent:
         :param children:
         :param categories:
         """
-        if len(category_indices)%2!=0:
-            raise ValueError("RecipeTree must be initialized with an even-length list, containing indices and their children.")
+        self.is_legal_object_recipe_tree(object_recipe_tree)
         self.num_categories = len(categories)
-        if agent_counts is None:
-            agent_counts = [1] * self.num_categories
-        self_index = category_indices[0]
-        children_indices = category_indices[1]
+        self_index = object_recipe_tree['index']
+        children_list = object_recipe_tree['children']
 
         self.category_index = self_index
         self.category = self_category = categories[self_index]
         self.name = self_category.name if isinstance(self_category, AgentCategory) else self_category
 
-        if children_indices is not None:
+        if children_list is not None:
             children = []
-            for child_index in range(0,len(children_indices),2):
-                child = RecipeTree(categories, children_indices[child_index:child_index+2])
+            for child_object in children_list:
+                child = RecipeTree(categories, child_object)
                 children.append(child)
             self.children = children
 
@@ -185,18 +191,18 @@ class RecipeTree (NodeMixin):
 
         :param indices: if True, each element in the path is a node index. Otherwise, it is the node name.
         """
-        self_id = self.category_index if indices==True else self.name
+        self_id = self.category_index if indices else self.name
         if len(self.children)==0:
             paths = [prefix + [self_id]]
         else:
             paths = []
             for child in self.children:
-                paths_from_child_to_leaf = child.paths_to_leaf(indices = indices, prefix = prefix + [self_id])
+                paths_from_child_to_leaf = child.paths_to_leaf(indices, prefix + [self_id])
                 paths += paths_from_child_to_leaf
         return paths
 
     @staticmethod
-    def recipe_from_path(path:List[int], num_categories:int, agent_counts:List[int] = None)->List[int]:
+    def recipe_from_path(path:List[int], num_categories:int)->List[int]:
         """
         Converts a path from the root to a leaf into a recipe.
         :param path: a list of indices of categories.
@@ -204,13 +210,10 @@ class RecipeTree (NodeMixin):
 
         >>> RecipeTree.recipe_from_path([0, 2, 3], 5)
         [1, 0, 1, 1, 0]
-
-        >>> RecipeTree.recipe_from_path([0, 2, 3], 5, [1, 2, 3, 2, 1])
-        [1, 0, 3, 2, 0]
         """
         result = [0]*num_categories
         for index in path:
-            result[index] = agent_counts[index] if agent_counts else 1
+            result[index] = 1
         return result
 
 

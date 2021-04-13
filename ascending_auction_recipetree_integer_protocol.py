@@ -6,16 +6,17 @@ Implementation of a multiple-clock strongly-budget-balanced ascending auction fo
 
 Allows multiple recipes, but only of the following kind:
 
-    [1, x, y, z, ...]
+    [x, y, z, ...]
 
-where x, y, z, etc. are either 0 or 1.
+where x, y, z, etc. are positive integers (or zero).
+For each recipe r1, r2. for every index i, if r1[i] > 0 and r2[i] > 0 so there must be: r1[i] = r2[i]
 
 I.e., there is a single buyer category and n-1 seller categories, and
 a single buyer may wish to buy different combinations or products.
 
 The smallest interesting example is:
 
-    [ [1, 1, 0, 0], [1, 0, 1, 1] ]
+    [ [1, 2, 0, 0], [1, 0, 1, 2] ]
 
 Author: Erel Segal-Halevi
 Since:  2020-03
@@ -70,7 +71,8 @@ class TradeWithMultipleRecipes(Trade):
         return self.num_of_deals_explanation_cache.rstrip()
 
 
-def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any])->TradeWithMultipleRecipes:
+def budget_balanced_ascending_auction(
+        market:Market, ps_recipe_struct: List[Any])->TradeWithMultipleRecipes:
     """
     Calculate the trade and prices using generalized-ascending-auction.
     Allows multiple recipes, but they must be represented by a *recipe tree*.
@@ -84,21 +86,22 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
     :return: Trade object, representing the trade and prices.
 
     >>> logger.setLevel(logging.DEBUG)
-    >>> # ONE BUYER, ONE SELLER
-    >>> recipe_11 = [0, [1, None]]
+    >>> # ONE BUYER, ONE SELLER #[0, [1, None]]
+    >>> recipe_11 = {'index': 0, 'count': 1, 'children': [{'index': 1, 'count': 1, 'children': []}]}
     >>>
-    >>> recipe_1100_1011 = [0, [1, None, 2, [3, None]]]
+    >>> #[0, [1, None, 2, [3, None]]]
+    >>> recipe_1100_1011 = {'index': 0, 'count': 1, 'children': [{'index': 1, 'count': 2, 'children': []}, {'index': 2, 'count': 1, 'children': [{'index': 2, 'count': 2, 'children': []}]}]}
     >>>
-    >>> market = Market([AgentCategory("buyer", [27.,21., 17.,11., 3.]), AgentCategory("seller", [-4.0, -5.0, -11.0]), AgentCategory("A", [-2.0, -3.0, -11.0]), AgentCategory("B", [-1.0, -2.0, -8.0])])
+    >>> market = Market([AgentCategory("buyer", [19.0, 18.0, 17.0, 13.0, 6.0, 2.0]), AgentCategory("seller", [-2.0, -2.0, -3.0, -4.0, -5.0, -8.0]), AgentCategory("A", [-1.0, -3.0, -5.0, -7.0]), AgentCategory("B", [-1.0, -2.0, -3.0, -4.0, -6.0, -8.0])])
     >>> print(market); print(budget_balanced_ascending_auction(market, recipe_1100_1011))
-    Traders: [buyer: [27.0, 21.0, 17.0, 11.0], seller: [-4.0, -5.0], A: [-2.0, -3.0], B: [-1.0, -2.0]]
-    seller: 1 potential deals, price=-5.0
-    B: 1 potential deals, price=-2.0
+    Traders: [buyer: [19.0, 18.0, 17.0, 13.0, 6.0, 2.0], seller: [-2.0, -2.0, -3.0, -4.0, -5.0, -8.0], A: [-1.0, -3.0, -5.0, -7.0], B: [-1.0, -2.0, -3.0, -4.0, -6.0, -8.0]]
+    seller: 2 potential deals, price=-5.0
+    B: 2 potential deals, price=-2.0
     A: all 1 traders selected, price=-3.0
-    B: all 1 traders selected
-    buyer: 2 out of 4 traders selected, price=5.0
+    B: all 2 traders selected
+    buyer: 3 out of 4 traders selected, price=9.0
     seller + A: all 2 traders selected
-    2 deals overall
+    3 deals overall
 
     >>> market = Market([AgentCategory("buyer", [17.,11.]), AgentCategory("seller", [-5.0]), AgentCategory("A", [-3.0]), AgentCategory("B", [-2.0])])
     >>> print(market); print(budget_balanced_ascending_auction(market, recipe_1100_1011))

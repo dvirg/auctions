@@ -6,19 +6,20 @@ Implementation of a multiple-clock strongly-budget-balanced ascending auction fo
 
 Allows multiple recipes, but only of the following kind:
 
-    [1, x, y, z, ...]
+    [x, y, z, ...]
 
-where x, y, z, etc. are either 0 or 1.
+where x, y, z, etc. are positive integers (or zero).
+For each recipe r1, r2. for every index i, if r1[i] > 0 and r2[i] > 0 so there must be: r1[i] = r2[i]
 
 I.e., there is a single buyer category and n-1 seller categories, and
 a single buyer may wish to buy different combinations or products.
 
 The smallest interesting example is:
 
-    [ [1, 1, 0, 0], [1, 0, 1, 1] ]
+    [ [1, 2, 0, 0], [1, 0, 1, 2] ]
 
-Author: Erel Segal-Halevi
-Since:  2020-03
+Author: Dvir Gilor
+Since:  2021-03
 """
 
 from agents import AgentCategory, EmptyCategoryException, MAX_VALUE
@@ -26,7 +27,7 @@ from markets import Market
 from trade import Trade, TradeWithSinglePrice
 from prices import SimultaneousAscendingPriceVectors, PriceStatus
 from typing import *
-from recipetree import RecipeTree
+from recipetree_integer2 import RecipeTree
 
 import logging, sys, math
 logger = logging.getLogger(__name__)
@@ -41,10 +42,11 @@ class TradeWithMultipleRecipes(Trade):
     Represents the outcome of budget_balanced_ascending_auction.
     See there for details.
     """
-    def __init__(self, categories:List[AgentCategory], recipe_tree:RecipeTree, prices:List[float]):
+    def __init__(self, categories:List[AgentCategory], recipe_tree:RecipeTree, prices:List[float], agent_counts:List[int]=None):
         self.categories = categories
         self.num_categories = len(categories)
         self.recipe_tree = recipe_tree
+        self.agent_counts = agent_counts if agent_counts else [1] * len(categories)
         self.prices = prices
         (self.num_of_deals_cache, self.num_of_deals_explanation_cache, self.kmin, self.kmax) = recipe_tree.num_of_deals_explained(prices)
         self.gft_cache = recipe_tree.optimal_trade_GFT()
@@ -70,7 +72,7 @@ class TradeWithMultipleRecipes(Trade):
         return self.num_of_deals_explanation_cache.rstrip()
 
 
-def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any])->TradeWithMultipleRecipes:
+def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any], agent_counts:List[int]=None)->TradeWithMultipleRecipes:
     """
     Calculate the trade and prices using generalized-ascending-auction.
     Allows multiple recipes, but they must be represented by a *recipe tree*.
@@ -139,9 +141,10 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
     logger.info("\n#### Multi-Recipe Budget-Balanced Ascending Auction\n")
     logger.info(market)
     logger.info("Procurement-set recipe struct: {}".format(ps_recipe_struct))
+    logger.info("Procurement-set recipe agent counts: {}".format(agent_counts))
 
     remaining_market = market.clone()
-    recipe_tree = RecipeTree(remaining_market.categories, ps_recipe_struct)
+    recipe_tree = RecipeTree(remaining_market.categories, ps_recipe_struct, agent_counts)
     logger.info("Tree of recipes: {}".format(recipe_tree.paths_to_leaf()))
     ps_recipes = recipe_tree.recipes()
     logger.info("Procurement-set recipes: {}".format(ps_recipes))
