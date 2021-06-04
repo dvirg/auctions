@@ -43,6 +43,8 @@ class RecipeTree (NodeMixin):
     [[60], [40], [20], [-30]]
     >>> tree.combined_values_detailed()
     [[60], [40], [20], [-30]]
+    >>> tree.combined_values_detailed_with_counters()
+    [[60], [40], [20], [-30]]
     >>> tree.optimal_trade_GFT()
     120
     >>> tree.largest_categories()[-1]
@@ -61,6 +63,8 @@ class RecipeTree (NodeMixin):
     [[60, 40], [20, -30]]
     >>> tree.combined_values_detailed()
     [[60, 40], [20, -30]]
+    >>> tree.combined_values_detailed_with_counters()
+    [[60, 40], [20, -30]]
     >>> tree.optimal_trade_GFT()
     100
     >>> tree.largest_categories()[-1]
@@ -78,6 +82,8 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values()
     [[60, -10], [40, -30], [20, -50]]
     >>> tree.combined_values_detailed()
+    [[60, -10], [40, -30], [20, -50]]
+    >>> tree.combined_values_detailed_with_counters()
     [[60, -10], [40, -30], [20, -50]]
     >>> tree.optimal_trade_GFT()
     60
@@ -99,6 +105,8 @@ class RecipeTree (NodeMixin):
     [[60, -10, -30]]
     >>> tree.combined_values_detailed()
     [[60, -10, -30]]
+    >>> tree.combined_values_detailed_with_counters()
+    [[60, -10, -30]]
     >>> tree.optimal_trade_GFT()
     20
     >>> tree.largest_categories()[-1]
@@ -118,6 +126,8 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values()
     [[60, -1], [40, -2], [20, -3], [-30, -4]]
     >>> tree.combined_values_detailed()
+    [[60, -1], [40, -2], [20, -3], [-30, -4]]
+    >>> tree.combined_values_detailed_with_counters()
     [[60, -1], [40, -2], [20, -3], [-30, -4]]
     >>> tree.optimal_trade_GFT()
     114
@@ -142,6 +152,8 @@ class RecipeTree (NodeMixin):
     [[60, -2], [40, -1, -3], [20, -4], [-30, -6]]
     >>> tree.combined_values_detailed()
     [[60, -2], [40, -1, -3], [20, -4], [-30, -6]]
+    >>> tree.combined_values_detailed_with_counters()
+    [[60, -2], [40, -1, -3], [20, -4], [-30, -6]]
     >>> tree.optimal_trade_GFT()
     110
     >>> tree.largest_categories()[-1]
@@ -165,6 +177,8 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values()
     [[60, -1, -2], [40, -3, -4], [20, -10], [-30, -5, -6]]
     >>> tree.combined_values_detailed()
+    [[60, -1, -2], [40, -3, -4], [20, -10], [-30, -5, -6]]
+    >>> tree.combined_values_detailed_with_counters()
     [[60, -1, -2], [40, -3, -4], [20, -10], [-30, -5, -6]]
     >>> tree.optimal_trade_GFT()
     100
@@ -194,6 +208,8 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values()
     [[60, -1, -2, -4], [40, -3, -6, -8], [20, -10, -30]]
     >>> tree.combined_values_detailed()
+    [[60, -1, -2, -4], [40, -3, -6, -8], [20, -10, -30]]
+    >>> tree.combined_values_detailed_with_counters()
     [[60, -1, -2, -4], [40, -3, -6, -8], [20, -10, -30]]
     >>> tree.optimal_trade_GFT()
     76
@@ -227,6 +243,8 @@ class RecipeTree (NodeMixin):
     >>> tree = RecipeTree(categories, [0, [1, None, 2, [3, None]]], [1,1,1,1])   # buyer -> seller, buyer -> producerA -> producerB
     >>> tree.combined_values_detailed()
     [[90, -1, -2], [80, -3, -4], [70, -10], [60, -30], [50, -50]]
+    >>> tree.combined_values_detailed_with_counters()
+    [[90, -1, -2], [80, -3, -4], [70, -10], [60, -30], [50, -50]]
     >>> tree.combined_values()
     [[90, -1, -2], [80, -3, -4], [70, -10], [60, -30], [50, -50]]
     >>> tree.optimal_trade_GFT()
@@ -243,6 +261,8 @@ class RecipeTree (NodeMixin):
     >>> categories = [buyer, seller, producerA, producerB]  # Indices: 0, 1, 2, 3
     >>> tree = RecipeTree(categories, [0, [1, None, 2, [3, None]]], [2,2,1,2])   # buyer -> seller, buyer -> producerA -> producerB
     >>> tree.combined_values_detailed()
+    [[90, 80, -1, -2, -4], [70, 60, -10, -30]]
+    >>> tree.combined_values_detailed_with_counters()
     [[90, 80, -1, -2, -4], [70, 60, -10, -30]]
     >>> tree.combined_values()
     [[90, 80, -1, -2, -4], [70, 60, -10, -30]]
@@ -380,8 +400,8 @@ class RecipeTree (NodeMixin):
                 current_set = []
 
         if len(self.children) > 0:
-            children_values = [child.combined_values() for child in self.children]
-            children_values.sort(key=lambda x: sum(x[0]), reverse=True)
+            children_values = [child.combined_values_detailed_with_counters() for child in self.children]
+            #children_values.sort(key=lambda x: sum(x[0]), reverse=True)
             #Get the min size
             min_len = min(len(value_sets), len(children_values))
             #zip the parent with its child value
@@ -390,6 +410,7 @@ class RecipeTree (NodeMixin):
             value_sets = children_values
 
             logger.debug("children_values: %s", value_sets)
+        value_sets.sort(key=lambda x: sum(x[0]), reverse=True)
         return value_sets
 
     def combined_values_detailed(self) -> list:

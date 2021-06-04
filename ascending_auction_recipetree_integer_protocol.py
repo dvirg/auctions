@@ -25,9 +25,9 @@ Since:  2021-03
 from agents import AgentCategory, EmptyCategoryException, MAX_VALUE
 from markets import Market
 from trade import Trade, TradeWithSinglePrice
-from prices import SimultaneousAscendingPriceVectors, PriceStatus
+from prices_integer import SimultaneousAscendingPriceVectors, PriceStatus
 from typing import *
-from recipetree_integer2 import RecipeTree
+from recipetree_integer import RecipeTree
 
 import logging, sys, math
 logger = logging.getLogger(__name__)
@@ -93,18 +93,19 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
     >>>
     >>> market = Market([AgentCategory("buyer", [27.,21., 17.,11., 3.]), AgentCategory("seller", [-4.0, -5.0, -11.0]), AgentCategory("A", [-2.0, -3.0, -11.0]), AgentCategory("B", [-1.0, -2.0, -8.0])])
     >>> print(market); print(budget_balanced_ascending_auction(market, recipe_1100_1011))
-    Traders: [buyer: [27.0, 21.0, 17.0, 11.0], seller: [-4.0, -5.0], A: [-2.0, -3.0], B: [-1.0, -2.0]]
+    Traders: [buyer: [27.0, 21.0, 17.0, 11.0, 3.0], seller: [-4.0, -5.0, -11.0], A: [-2.0, -3.0, -11.0], B: [-1.0, -2.0, -8.0]]
     seller: 1 potential deals, price=-5.0
     B: 1 potential deals, price=-2.0
     A: all 1 traders selected, price=-3.0
-    B: all 1 traders selected
+    B: all 1 deals selected
     buyer: 2 out of 4 traders selected, price=5.0
-    seller + A: all 2 traders selected
+    seller + A: all 2 deals selected
     2 deals overall
 
     >>> market = Market([AgentCategory("buyer", [17.,11.]), AgentCategory("seller", [-5.0]), AgentCategory("A", [-3.0]), AgentCategory("B", [-2.0])])
     >>> print(market); print(budget_balanced_ascending_auction(market, recipe_1100_1011))
-    Traders: [buyer: [17.,11.], seller: [-5.0], A: [-3.0], B: [-2.0]]
+    Traders: [buyer: [17.0, 11.0], seller: [-5.0], A: [-3.0], B: [-2.0]]
+    No trade
 
 
     >>> market = Market([AgentCategory("buyer", [9.]),  AgentCategory("seller", [-4.])])
@@ -117,7 +118,7 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
     Traders: [buyer: [9.0, 8.0], seller: [-4.0]]
     seller: 1 potential deals, price=-8.0
     buyer: all 1 traders selected, price=8.0
-    seller: all 1 traders selected
+    seller: all 1 deals selected
     1 deals overall
 
     >>> logger.setLevel(logging.WARNING)
@@ -132,7 +133,7 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
     Traders: [buyer: [9.0, 8.0], seller: [-3.0, -4.0]]
     seller: 1 potential deals, price=-4.0
     buyer: 1 out of 2 traders selected, price=4.0
-    seller: all 1 traders selected
+    seller: all 1 deals selected
     1 deals overall
 
     """
