@@ -48,11 +48,14 @@ class TradeWithMultipleRecipes(Trade):
         self.recipe_tree = recipe_tree
         self.agent_counts = agent_counts if agent_counts else [1] * len(categories)
         self.prices = prices
-        (self.num_of_deals_cache, self.num_of_deals_explanation_cache, self.kmin, self.kmax) = recipe_tree.num_of_deals_explained(prices)
+        (self.num_of_deals_cache, self.num_of_deals_explanation_cache, self.kmin, self.kmax, self.path_counters) = recipe_tree.num_of_deals_explained(prices)
         self.gft_cache = recipe_tree.optimal_trade_GFT()
 
     def num_of_deals(self):
         return self.num_of_deals_cache
+
+    def path_counters(self):
+        return self.path_counters
 
     def min_num_of_deals(self):
         return self.kmin
@@ -88,18 +91,20 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
     >>> logger.setLevel(logging.DEBUG)
     >>> # ONE BUYER, ONE SELLER
     >>> recipe_11 = [0, [1, None]]
-    >>>
+    >>> agent_counts = [1, 2, 1, 2]
     >>> recipe_1100_1011 = [0, [1, None, 2, [3, None]]]
     >>>
     >>> market = Market([AgentCategory("buyer", [27.,21., 17.,11., 3.]), AgentCategory("seller", [-4.0, -5.0, -11.0]), AgentCategory("A", [-2.0, -3.0, -11.0]), AgentCategory("B", [-1.0, -2.0, -8.0])])
-    >>> print(market); print(budget_balanced_ascending_auction(market, recipe_1100_1011))
+    >>> RecipeTree(market.categories, recipe_1100_1011, agent_counts).optimal_trade_with_counters()
+    ([([27.0, -2.0, -1.0, -2.0], {'counter': 1, 'index': 3}), ([21.0, -4.0, -5.0], {'counter': 1, 'index': 1})], 2, 34.0, 1, 1, {'3': 1, '1': 1})
+    >>> print(market); print(budget_balanced_ascending_auction(market, recipe_1100_1011, agent_counts))
     Traders: [buyer: [27.0, 21.0, 17.0, 11.0, 3.0], seller: [-4.0, -5.0, -11.0], A: [-2.0, -3.0, -11.0], B: [-1.0, -2.0, -8.0]]
     seller: 1 potential deals, price=-5.0
     B: 1 potential deals, price=-2.0
     A: all 1 traders selected, price=-3.0
-    B: all 1 deals selected
+    (B): all 1 deals selected
     buyer: 2 out of 4 traders selected, price=5.0
-    seller + A: all 2 deals selected
+    (seller + A): all 2 deals selected
     2 deals overall
 
     >>> market = Market([AgentCategory("buyer", [17.,11.]), AgentCategory("seller", [-5.0]), AgentCategory("A", [-3.0]), AgentCategory("B", [-2.0])])

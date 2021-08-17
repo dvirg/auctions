@@ -12,6 +12,7 @@ from typing import *
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler(sys.stdout))
+logger.setLevel(logging.INFO)
 # To enable tracing, set logger.setLevel(logging.INFO)
 
 
@@ -49,10 +50,10 @@ class AscendingPriceVector:
         self.prices[category_index] = new_price
 
     def price_sum(self):
-        return dot(self.prices, self.ps_recipe, self.agent_counts)
+        return dot(self.prices, self.ps_recipe)#, self.agent_counts)
 
     def price_sum_without_category(self, category_index:int):
-        return self.price_sum() - self.ps_recipe[category_index]*self.prices[category_index] * self.agent_counts[category_index]
+        return self.price_sum() - self.ps_recipe[category_index]*self.prices[category_index] #* self.agent_counts[category_index]
 
     def price_sum_after_increase(self, category_index:int, new_price:float):
         """
@@ -63,14 +64,14 @@ class AscendingPriceVector:
         >>> p = AscendingPriceVector([1, 0, 1, 1], -1000)
         >>> p.price_sum_after_increase(0, 10)
         -1990
-        >>> p = AscendingPriceVector([1, 1, 0, 0], -1000, [2, 1, 1, 1])
+        >>> p = AscendingPriceVector([2, 1, 0, 0], -1000, [2, 1, 1, 1])
         >>> p.price_sum_after_increase(0, 10)
         -980
-        >>> p = AscendingPriceVector([1, 0, 1, 1], -1000, [3, 1, 1, 1])
+        >>> p = AscendingPriceVector([3, 0, 1, 1], -1000, [3, 1, 1, 1])
         >>> p.price_sum_after_increase(0, 10)
         -1970
         """
-        return self.price_sum_without_category(category_index) + self.ps_recipe[category_index]*new_price * self.agent_counts[category_index]
+        return self.price_sum_without_category(category_index) + self.ps_recipe[category_index]*new_price #* self.agent_counts[category_index]
 
     def increase_price_up_to_balance(self, category_index:int, new_price:float, description:str, sum_upper_bound:float=0):
         """
@@ -205,6 +206,22 @@ class SimultaneousAscendingPriceVectors:
         >>> pv.increase_prices ([(1,-80, "seller"), (3,-10,"halfseller-B")])
         >>> str(pv)
         '[100.0, -100.0, -80.0, -20.0] PriceStatus.STOPPED_AT_ZERO_SUM'
+
+        >>> pv = SimultaneousAscendingPriceVectors([[1, 2, 0, 0], [1, 0, 1, 2]], -10000, [1, 2, 1, 2])
+        >>> str(pv)
+        '[-10000.0, -15000.0, -10000.0, -10000.0] None'
+        >>> pv.increase_prices ([(1,-80, "seller"), (2,-80,"halfseller-A")])
+        >>> str(pv)
+        '[-10000.0, -10040.0, -80.0, -10000.0] PriceStatus.STOPPED_AT_AGENT_VALUE'
+        >>> pv.increase_prices ([(1,-80, "seller"), (3,-80,"halfseller-B")])
+        >>> str(pv)
+        '[-10000.0, -120.0, -80.0, -80.0] PriceStatus.STOPPED_AT_AGENT_VALUE'
+        >>> pv.increase_prices ([(0,100, "buyer")])
+        >>> str(pv)
+        '[100.0, -120.0, -80.0, -80.0] PriceStatus.STOPPED_AT_AGENT_VALUE'
+        >>> pv.increase_prices ([(1,-80, "seller"), (3,-10,"halfseller-B")])
+        >>> str(pv)
+        '[100.0, -80.0, -80.0, -40.0] PriceStatus.STOPPED_AT_AGENT_VALUE'
         """
         logger.info("  Prices before increase: %s", self.map_category_index_to_price())
         logger.info("  Planned increase: %s", increases)
@@ -220,7 +237,7 @@ class SimultaneousAscendingPriceVectors:
         #    raise ValueError("There must be exactly one increase per recipe!")
 
         increase_to_upper_bound = sum_upper_bound - self.price_sum()
-        increases_to_new_prices = [new_price - self.vector[category_index]
+        increases_to_new_prices = [(new_price - self.vector[category_index]) * self.agent_counts[category_index]
                                    for (category_index,new_price,_) in increases]
         min_increase_to_new_price = min(increases_to_new_prices)
         min_increase = min(min_increase_to_new_price, increase_to_upper_bound)
@@ -234,7 +251,7 @@ class SimultaneousAscendingPriceVectors:
         else: # min_increase == min_increase_to_new_price:
             self.status = PriceStatus.STOPPED_AT_AGENT_VALUE
             for (category_index, new_price, description) in increases:
-                fixed_new_price = self.vector[category_index] + min_increase * self.agent_counts[category_index]
+                fixed_new_price = self.vector[category_index] + min_increase / self.agent_counts[category_index]
                 if fixed_new_price == new_price:
                     logger.info("{}: price increases to {}".format(description, new_price))
                 else:
@@ -263,8 +280,8 @@ def calculate_initial_prices(ps_recipes:List[List[int]], max_price_per_category:
     [-100.0, -150.0, -100.0, -100.0]
     >>> calculate_initial_prices([[1,2,0,0],[1,0,1,3]], -100)
     [-100.0, -200.0, -100.0, -100.0]
-    >>> calculate_initial_prices([[2,2,0,0],[1,0,1,3]], -100)
-    [-100.0, -200.0, -100.0, -100.0]
+    >>> calculate_initial_prices([[2,3,0,0],[2,0,1,3]], -300)
+    [-300.0, -400.0, -300.0, -300.0]
     """
     num_recipes = len(ps_recipes)
     num_categories = len(ps_recipes[0])
