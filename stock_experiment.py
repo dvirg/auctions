@@ -42,7 +42,7 @@ from typing import Callable
 
 from tee_table.tee_table import TeeTable
 from collections import OrderedDict
-from get_stocks_data import getStocksPrices
+from stock_get_stocks_data import getStocksPrices
 
 TABLE_COLUMNS = ["stock_name","auction_name", "recipe", "num_possible_trades", "optimal_count", "auction_count",
                  "count_ratio", "optimal_gft", "auction_gft", "auction_gft_ratio", "auction_market_gft", "market_gft_ratio"]

@@ -7,12 +7,12 @@ Author: Dvir Gilor
 Since:  2020-08
 """
 
-from experiment_stock import  experiment
+from stock_experiment import experiment
 
 from ascending_auction_protocol import budget_balanced_ascending_auction
 import sys
 
-results_file = "results/ascending_auction_stock.csv"
+results_file = "stock/results/ascending_auction_stock.csv"
 SBB_ASCENDING_STOCKS = "SBB Ascending Prices with Stocks"
 
 experiment(results_file,budget_balanced_ascending_auction, SBB_ASCENDING_STOCKS, (1, 1))
