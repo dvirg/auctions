@@ -11,6 +11,12 @@ To run the examples from the paper, try one of the following.
 
 Running all experiments described in experiments' section (5):
 
+    python experiment_recpietree_integer.py
+    
+Example results can be found in the `results/experiment_recipetree_random.csv` folder.
+
+Running all BINARY experiments described in experiments' section (5):
+
     python stock/experiment_comparing_all_with_all_recipes.py
     
 Example results can be found in the `stock/results/` folder.
