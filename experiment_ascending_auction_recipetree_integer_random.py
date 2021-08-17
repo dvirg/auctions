@@ -64,6 +64,7 @@ def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_a
     print('recipe:', recipe)
     ROUND = 5
     results_table = TeeTable(TABLE_COLUMNS, results_csv_file)
+    num_recipes = len(recipe_tree_agent_counts)
     recipe_str = str(recipe).replace(',', '-')
     for i in range(len(nums_of_agents)):
         sum_optimal_count = sum_auction_count = sum_optimal_kmin = sum_optimal_kmax = 0  # count the number of deals done in the optimal vs. the actual auction.
@@ -79,6 +80,7 @@ def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_a
                                                              value_ranges[sign][1]*agent_values[category]))
                 #agents.append(AgentCategory.uniformly_random("agent", nums_of_agents[i], value_ranges[sign][0], value_ranges[sign][1]))
             market = Market(agents)
+            #print(market)
             #print(agents)
             recipe_tree = RecipeTree(market.categories, recipe, recipe_tree_agent_counts)
             optimal_trade, optimal_count, optimal_gft, kmin, kmax, categories_optimal_counters = recipe_tree.optimal_trade_with_counters()
@@ -88,9 +90,11 @@ def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_a
             auction_count = auction_trade.num_of_deals()
             path_counters = auction_trade.path_counters
             gft = auction_trade.gain_from_trade()
-            print('Compare:', categories_optimal_counters, path_counters)
+            #print('Compare:', categories_optimal_counters, path_counters)
             for counter in categories_optimal_counters.keys():
-                if categories_optimal_counters[counter] != path_counters[counter]:
+                if categories_optimal_counters[counter] > path_counters[counter] + 1 and False:
+                    print(market)
+                    print('Compare:', categories_optimal_counters, path_counters)
                     print('Warning counters', str(counter), 'are not in same size!', categories_optimal_counters[counter], '!=', path_counters[counter])
             #for i in range(len(path_counters)):
             #    print('Compare:', categories_optimal_counters, path_counters)
@@ -126,7 +130,7 @@ def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_a
             ("meanoptimalcount", round(sum_optimal_count/num_of_iterations,ROUND)),
             ("meanoptimalkmin", kmin_mean),
             ("meanoptimalkmax", round(sum_optimal_kmax/num_of_iterations,ROUND)),
-            ("gftformula", round((kmin_mean - 1)/(kmin_mean + 1)*100,ROUND) if (kmin_mean - 1)/(kmin_mean + 1) > 0 else 0),
+            ("gftformula", round((kmin_mean - num_recipes)/(kmin_mean + num_recipes)*100,ROUND) if (kmin_mean - num_recipes)/(kmin_mean + num_recipes) > 0 else 0),
             ("meanauctioncount", round(sum_auction_count/num_of_iterations,ROUND)),
             ("countratio", 0 if sum_optimal_count==0 else round((sum_auction_count / sum_optimal_count) * 100, ROUND)),
             ("meanoptimalgft", round(sum_optimal_gft/num_of_iterations,ROUND)),

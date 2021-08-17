@@ -99,12 +99,12 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
     ([([27.0, -2.0, -1.0, -2.0], {'counter': 1, 'index': 3}), ([21.0, -4.0, -5.0], {'counter': 1, 'index': 1})], 2, 34.0, 1, 1, {'3': 1, '1': 1})
     >>> print(market); print(budget_balanced_ascending_auction(market, recipe_1100_1011, agent_counts))
     Traders: [buyer: [27.0, 21.0, 17.0, 11.0, 3.0], seller: [-4.0, -5.0, -11.0], A: [-2.0, -3.0, -11.0], B: [-1.0, -2.0, -8.0]]
-    seller: 1 potential deals, price=-5.0
-    B: 1 potential deals, price=-2.0
-    A: all 1 traders selected, price=-3.0
-    (B): all 1 deals selected
-    buyer: 2 out of 4 traders selected, price=5.0
-    (seller + A): all 2 deals selected
+    seller: 1 potential deals, price=-8.5
+    B: 1 potential deals, price=-7.0
+    A: all 1 remaining traders selected, price=-3.0
+    (B): all 1 remaining deals selected
+    buyer: all 2 remaining traders selected, price=17.0
+    (seller + A): all 2 remaining deals selected
     2 deals overall
 
     >>> market = Market([AgentCategory("buyer", [17.,11.]), AgentCategory("seller", [-5.0]), AgentCategory("A", [-3.0]), AgentCategory("B", [-2.0])])
@@ -122,8 +122,8 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
     >>> print(market); print(budget_balanced_ascending_auction(market, recipe_11))
     Traders: [buyer: [9.0, 8.0], seller: [-4.0]]
     seller: 1 potential deals, price=-8.0
-    buyer: all 1 traders selected, price=8.0
-    seller: all 1 deals selected
+    buyer: all 1 remaining traders selected, price=8.0
+    (seller): all 1 remaining deals selected
     1 deals overall
 
     >>> logger.setLevel(logging.WARNING)
@@ -137,8 +137,8 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
     >>> print(market); print(budget_balanced_ascending_auction(market, recipe_11))
     Traders: [buyer: [9.0, 8.0], seller: [-3.0, -4.0]]
     seller: 1 potential deals, price=-4.0
-    buyer: 1 out of 2 traders selected, price=4.0
-    seller: all 1 deals selected
+    buyer: 1 out of 2 remaining traders selected, price=4.0
+    (seller): all 1 remaining deals selected
     1 deals overall
 
     """
@@ -162,7 +162,7 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
 
     #### STOPPED HERE
 
-    prices = SimultaneousAscendingPriceVectors(ps_recipes, -MAX_VALUE)
+    prices = SimultaneousAscendingPriceVectors(ps_recipes, -MAX_VALUE, agent_counts)
     while True:
         largest_category_size, combined_category_size, indices_of_prices_to_increase = recipe_tree.largest_categories(indices=True)
         logger.info("\n")
@@ -173,7 +173,7 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
             logger.info("\nCombined category size is 0 - no trade!")
             logger.info("  Final price-per-unit vector: %s", prices)
             logger.info(remaining_market)
-            return TradeWithMultipleRecipes(remaining_market.categories, recipe_tree, prices.map_category_index_to_price())
+            return TradeWithMultipleRecipes(remaining_market.categories, recipe_tree, prices.map_category_index_to_price(), agent_counts)
 
         increases = []
         for category_index in indices_of_prices_to_increase:
@@ -189,7 +189,7 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
             logger.info("\nPrice crossed zero.")
             logger.info("  Final price-per-unit vector: %s", map_category_index_to_price)
             logger.info(remaining_market)
-            return TradeWithMultipleRecipes(remaining_market.categories, recipe_tree, map_category_index_to_price)
+            return TradeWithMultipleRecipes(remaining_market.categories, recipe_tree, map_category_index_to_price, agent_counts)
 
         for category_index in range(market.num_categories):
             category = remaining_market.categories[category_index]
@@ -198,7 +198,7 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
                 and category.lowest_agent_value() <= map_category_index_to_price[category_index]:
                     category.remove_lowest_agent()
                     logger.info("{} after: {} agents remain".format(category.name, category.size()))
-
+                    break
 
 
 

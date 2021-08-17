@@ -18,9 +18,9 @@ results_file = "results/experiment_recipetree"
 
 nums_of_agents = [2, 4, 6, 10, 16, 26, 50, 100, 500, 1000, 2000, 5000, 10000, 20000, 50000,100000, 200000, 500000, 1000000]
 
-print("\n\n###### TEST MULTI RECIPE AUCTION WITH A SINGLE PATH: [1,1,1]")
+print("\n\n###### TEST MULTI RECIPE AUCTION WITH 2 paths: [(1,2,0,0),(1,0,1,2]")
 
-iterations = 50
+iterations = 50#00
 prices = [[[400, 300, 200, 100],[-1, -11],[-2, -22],[-3, -33],[-4, -44],[-5, -55],[-6, -66]]]
 
 recipes_111 = [1, [2, [0, None]]] # buyer <- sellerB <- sellerA; [1,1,1]
@@ -35,13 +35,13 @@ run_random = True
 for recipe in recipes:
     if run_random:
         experiment_ascending_auction_recipetree_integer_random.experiment(results_file + "_random.csv",
-                                                                  recipe=recipe,
+                                                                  recipe=recipes_4paths, #recipe,
                                                                   value_ranges   = [(1,1000),(-1000,-1)],
                                                                   nums_of_agents = (2, 4, 6, 10, 16, 26, 50, 100, 500, 1000, 2000, 5000),
                                                                   num_of_iterations = iterations,
-                                                                  agent_counts = [2,2,1,2],
-                                                                  agent_values = [3,1.5,1,1],
-                                                                  recipe_tree_agent_counts = [1, 2, 1, 2]
+                                                                  agent_counts = [1,1,1,1,1,1,1],#[1,1,1,1],#[1,2,1,2],
+                                                                  agent_values = [1,1,1,1,1,1,1], #[3,1.5,1,1],
+                                                                  recipe_tree_agent_counts = [1, 2, 2, 1, 1, 2,1] # [1, 2, 1, 2]
                                                                   )
 
     else:

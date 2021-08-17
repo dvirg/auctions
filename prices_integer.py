@@ -12,7 +12,7 @@ from typing import *
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler(sys.stdout))
-logger.setLevel(logging.INFO)
+#logger.setLevel(logging.INFO)
 # To enable tracing, set logger.setLevel(logging.INFO)
 
 
@@ -244,7 +244,7 @@ class SimultaneousAscendingPriceVectors:
         if min_increase == increase_to_upper_bound:
             self.status = PriceStatus.STOPPED_AT_ZERO_SUM
             for (category_index, new_price, description) in increases:
-                fixed_new_price = self.vector[category_index] + min_increase * self.agent_counts[category_index]
+                fixed_new_price = self.vector[category_index] + min_increase / self.agent_counts[category_index]
                 logger.info("{}: while increasing price towards {}, stopped at {} where the price-sum crossed {}".format(description, new_price, fixed_new_price, sum_upper_bound))
                 self.vector[category_index] = fixed_new_price
 
