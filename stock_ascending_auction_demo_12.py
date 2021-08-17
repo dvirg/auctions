@@ -12,7 +12,7 @@ from markets import Market
 from agents import AgentCategory
 import ascending_auction_protocol, prices
 from ascending_auction_protocol import budget_balanced_ascending_auction
-from get_stock_data import getPrices
+from stock_get_stock_data import getPrices
 
 import logging
 ascending_auction_protocol.logger.setLevel(logging.INFO)

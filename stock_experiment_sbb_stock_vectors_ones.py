@@ -12,9 +12,9 @@ Author: Dvir Gilor
 
 from trade_reduction_protocol import budget_balanced_trade_reduction
 from ascending_auction_protocol import budget_balanced_ascending_auction
-from experiment_compare_iterations_autions_without_mcafee import experiment
+from stock_experiment_compare_iterations_autions_without_mcafee import experiment
 
-results_file = "results/experiment_sbb_with_vectors_of_ones_stock.csv"
+results_file = "stock/results/experiment_sbb_with_vectors_of_ones_stock.csv"
 
 for num_of_seller_categories in (2,4,8,16):
     num_of_categories = num_of_seller_categories+1

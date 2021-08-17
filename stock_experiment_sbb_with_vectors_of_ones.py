@@ -16,7 +16,7 @@ from trade_reduction_protocol import budget_balanced_trade_reduction
 from ascending_auction_protocol import budget_balanced_ascending_auction
 import sys
 
-results_file = "results/experiment_sbb_with_vectors_of_ones_stock.csv"
+results_file = "stock/results/experiment_sbb_with_vectors_of_ones_stock.csv"
 
 experiment(results_file,budget_balanced_ascending_auction, "SBB Ascending Prices", recipe=4*(1,))
 
