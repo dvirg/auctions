@@ -44,7 +44,7 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values_detailed()
     [[60], [40], [20], [-30]]
     >>> tree.combined_values_detailed_with_counters()
-    [[60], [40], [20], [-30]]
+    [([60], {'counter': 0, 'index': 0}), ([40], {'counter': 0, 'index': 0}), ([20], {'counter': 0, 'index': 0}), ([-30], {'counter': 0, 'index': 0})]
     >>> tree.optimal_trade_GFT()
     120
     >>> tree.largest_categories()[-1]
@@ -64,7 +64,7 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values_detailed()
     [[60, 40], [20, -30]]
     >>> tree.combined_values_detailed_with_counters()
-    [[60, 40], [20, -30]]
+    [([60, 40], {'counter': 0, 'index': 0}), ([20, -30], {'counter': 0, 'index': 0})]
     >>> tree.optimal_trade_GFT()
     100
     >>> tree.largest_categories()[-1]
@@ -77,6 +77,8 @@ class RecipeTree (NodeMixin):
     buyer: 2 potential deals, price=1
     2 deals overall
     <BLANKLINE>
+    >>> tree.combined_values_detailed_with_counters()
+    [([60, 40], {'counter': 0, 'index': 0}), ([20, -30], {'counter': 0, 'index': 0})]
 
     >>> tree = RecipeTree(categories, [0, [1, None]])   # buyer -> seller
     >>> tree.combined_values()
@@ -84,7 +86,9 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values_detailed()
     [[60, -10], [40, -30], [20, -50]]
     >>> tree.combined_values_detailed_with_counters()
-    [[60, -10], [40, -30], [20, -50]]
+    [([60, -10], {'counter': 0, 'index': 1}), ([40, -30], {'counter': 0, 'index': 1}), ([20, -50], {'counter': 0, 'index': 1})]
+    >>> tree.optimal_trade_with_counters()
+    ([([60, -10], {'counter': 2, 'index': 1}), ([40, -30], {'counter': 2, 'index': 1})], 2, 60, 2, 2, {'1': 2})
     >>> tree.optimal_trade_GFT()
     60
     >>> tree.largest_categories()[-1]
@@ -95,8 +99,14 @@ class RecipeTree (NodeMixin):
     3
     >>> print(tree.num_of_deals_explained(prices=[1,2,3,4])[1])
     seller: 3 potential deals, price=2
-    buyer: 3 out of 4 traders selected, price=1
-    seller: all 3 deals selected
+    buyer: 3 out of 4 remaining traders selected, price=1
+    (seller): all 3 remaining deals selected
+    3 deals overall
+    <BLANKLINE>
+    >>> print(tree.num_of_deals_explained(prices=[1,2,3,4])[1])
+    seller: 3 potential deals, price=2
+    buyer: 3 out of 4 remaining traders selected, price=1
+    (seller): all 3 remaining deals selected
     3 deals overall
     <BLANKLINE>
 
@@ -106,7 +116,7 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values_detailed()
     [[60, -10, -30]]
     >>> tree.combined_values_detailed_with_counters()
-    [[60, -10, -30]]
+    [([60, -10, -30], {'counter': 0, 'index': 1})]
     >>> tree.optimal_trade_GFT()
     20
     >>> tree.largest_categories()[-1]
@@ -117,8 +127,8 @@ class RecipeTree (NodeMixin):
     1
     >>> print(tree.num_of_deals_explained(prices=[1,2,3,4])[1])
     seller: 1 potential deals, price=2
-    buyer: 1 out of 4 traders selected, price=1
-    seller: all 1 deals selected
+    buyer: 1 out of 4 remaining traders selected, price=1
+    (seller): all 1 remaining deals selected
     1 deals overall
     <BLANKLINE>
 
@@ -128,7 +138,7 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values_detailed()
     [[60, -1], [40, -2], [20, -3], [-30, -4]]
     >>> tree.combined_values_detailed_with_counters()
-    [[60, -1], [40, -2], [20, -3], [-30, -4]]
+    [([60, -1], {'counter': 0, 'index': 2}), ([40, -2], {'counter': 0, 'index': 3}), ([20, -3], {'counter': 0, 'index': 2}), ([-30, -4], {'counter': 0, 'index': 3})]
     >>> tree.optimal_trade_GFT()
     114
     >>> tree.largest_categories()[-1]
@@ -142,8 +152,8 @@ class RecipeTree (NodeMixin):
     >>> print(tree.num_of_deals_explained(prices=[1,2,3,4])[1])
     producerA: 3 potential deals, price=3
     producerB: 4 potential deals, price=4
-    buyer: all 4 traders selected, price=1
-    producerA + producerB: 4 out of 7 deals selected
+    buyer: all 4 remaining traders selected, price=1
+    (producerA + producerB): 4 out of 7 remaining deals selected
     4 deals overall
     <BLANKLINE>
 
@@ -153,7 +163,7 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values_detailed()
     [[60, -2], [40, -1, -3], [20, -4], [-30, -6]]
     >>> tree.combined_values_detailed_with_counters()
-    [[60, -2], [40, -1, -3], [20, -4], [-30, -6]]
+    [([60, -2], {'counter': 0, 'index': 3}), ([40, -1, -3], {'counter': 0, 'index': 2}), ([20, -4], {'counter': 0, 'index': 3}), ([-30, -6], {'counter': 0, 'index': 3})]
     >>> tree.optimal_trade_GFT()
     110
     >>> tree.largest_categories()[-1]
@@ -167,8 +177,8 @@ class RecipeTree (NodeMixin):
     >>> print(tree.num_of_deals_explained(prices=[1,2,3,4])[1])
     producerA: 1 potential deals, price=3
     producerB: 4 potential deals, price=4
-    buyer: all 4 traders selected, price=1
-    producerA + producerB: 4 out of 5 deals selected
+    buyer: all 4 remaining traders selected, price=1
+    (producerA + producerB): 4 out of 5 remaining deals selected
     4 deals overall
     <BLANKLINE>
 
@@ -179,9 +189,11 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values_detailed()
     [[60, -1, -2], [40, -3, -4], [20, -10], [-30, -5, -6]]
     >>> tree.combined_values_detailed_with_counters()
-    [[60, -1, -2], [40, -3, -4], [20, -10], [-30, -5, -6]]
+    [([60, -1, -2], {'counter': 0, 'index': 3}), ([40, -3, -4], {'counter': 0, 'index': 3}), ([20, -10], {'counter': 0, 'index': 1}), ([-30, -5, -6], {'counter': 0, 'index': 3})]
     >>> tree.optimal_trade_GFT()
     100
+    >>> tree.optimal_trade_with_counters()
+    ([([60, -1, -2], {'counter': 2, 'index': 3}), ([40, -3, -4], {'counter': 2, 'index': 3}), ([20, -10], {'counter': 1, 'index': 1})], 3, 100, 1, 2, {'3': 2, '1': 1})
     >>> tree.largest_categories()[-1]
     ['seller', 'producerB']
     >>> tree.largest_categories(indices=True)[-1]
@@ -194,13 +206,13 @@ class RecipeTree (NodeMixin):
     [[1, 1, 0, 0], [1, 0, 1, 1]]
     >>> tree.num_of_deals()
     4
-    >>> print(tree.num_of_deals_explained(prices=[1,2,3,4])[1])
-    seller: 3 potential deals, price=2
-    producerB: 4 potential deals, price=4
-    producerA: all 3 traders selected, price=3
-    producerB: 3 out of 4 deals selected
-    buyer: all 4 traders selected, price=1
-    seller + producerA: 4 out of 6 deals selected
+    >>> print(tree.num_of_deals_explained(prices=[10,-10,-3,-7])[1])
+    seller: 3 potential deals, price=-10
+    producerB: 4 potential deals, price=-7
+    producerA: all 3 remaining traders selected, price=-3
+    (producerB): 3 out of 4 remaining deals selected
+    buyer: all 4 remaining traders selected, price=10
+    (seller + producerA): 4 out of 6 remaining deals selected
     4 deals overall
     <BLANKLINE>
 
@@ -210,9 +222,11 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values_detailed()
     [[60, -1, -2, -4], [40, -3, -6, -8], [20, -10, -30]]
     >>> tree.combined_values_detailed_with_counters()
-    [[60, -1, -2, -4], [40, -3, -6, -8], [20, -10, -30]]
+    [([60, -1, -2, -4], {'counter': 0, 'index': 3}), ([40, -3, -6, -8], {'counter': 0, 'index': 3}), ([20, -10, -30], {'counter': 0, 'index': 1})]
     >>> tree.optimal_trade_GFT()
     76
+    >>> tree.optimal_trade_with_counters()
+    ([([60, -1, -2, -4], {'counter': 2, 'index': 3}), ([40, -3, -6, -8], {'counter': 2, 'index': 3})], 2, 76, 2, 2, {'3': 2})
     >>> tree.largest_categories()[-1]
     ['seller', 'producerA']
     >>> tree.largest_categories(indices=True)[-1]
@@ -225,13 +239,13 @@ class RecipeTree (NodeMixin):
     [[1, 2, 0, 0], [1, 0, 1, 2]]
     >>> tree.num_of_deals()
     3
-    >>> print(tree.num_of_deals_explained(prices=[1,2,3,4])[1])
-    seller: 1 potential deals, price=2
-    producerB: 2 potential deals, price=4
-    producerA: 2 out of 3 traders selected, price=3
-    producerB: all 2 deals selected
-    buyer: 3 out of 4 traders selected, price=1
-    seller + producerA: all 3 deals selected
+    >>> print(tree.num_of_deals_explained(prices=[60,-30,-20,-20])[1])
+    seller: 1 potential deals, price=-30
+    producerB: 2 potential deals, price=-20
+    producerA: 2 out of 3 remaining traders selected, price=-20
+    (producerB): all 2 remaining deals selected
+    buyer: 3 out of 4 remaining traders selected, price=60
+    (seller + producerA): all 3 remaining deals selected
     3 deals overall
     <BLANKLINE>
 
@@ -244,7 +258,7 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values_detailed()
     [[90, -1, -2], [80, -3, -4], [70, -10], [60, -30], [50, -50]]
     >>> tree.combined_values_detailed_with_counters()
-    [[90, -1, -2], [80, -3, -4], [70, -10], [60, -30], [50, -50]]
+    [([90, -1, -2], {'counter': 0, 'index': 3}), ([80, -3, -4], {'counter': 0, 'index': 3}), ([70, -10], {'counter': 0, 'index': 1}), ([60, -30], {'counter': 0, 'index': 1}), ([50, -50], {'counter': 0, 'index': 1})]
     >>> tree.combined_values()
     [[90, -1, -2], [80, -3, -4], [70, -10], [60, -30], [50, -50]]
     >>> tree.optimal_trade_GFT()
@@ -263,7 +277,7 @@ class RecipeTree (NodeMixin):
     >>> tree.combined_values_detailed()
     [[90, 80, -1, -2, -4], [70, 60, -10, -30]]
     >>> tree.combined_values_detailed_with_counters()
-    [[90, 80, -1, -2, -4], [70, 60, -10, -30]]
+    [([80, 90, -1, -2, -4], {'counter': 0, 'index': 3}), ([60, 70, -10, -30], {'counter': 0, 'index': 1})]
     >>> tree.combined_values()
     [[90, 80, -1, -2, -4], [70, 60, -10, -30]]
     >>> tree.optimal_trade_GFT()
@@ -393,24 +407,28 @@ class RecipeTree (NodeMixin):
         self_values.sort(reverse=True)
         value_sets = []
         current_set = []
+        path_counter = {'counter': 0, 'index': self.category_index}
         for value in self_values:
             current_set.append(value)
             if len(current_set) == self.agent_count:
-                value_sets.append((current_set, {'counter': 0}))
+                value_sets.append((current_set, path_counter))
                 current_set = []
 
         if len(self.children) > 0:
             children_values = [child.combined_values_detailed_with_counters() for child in self.children]
-            #children_values.sort(key=lambda x: sum(x[0]), reverse=True)
+            children_values = [item for sublist in children_values for item in sublist]
+            children_values.sort(key=lambda x: sum(x[0]), reverse=True)
             #Get the min size
             min_len = min(len(value_sets), len(children_values))
+            children_values = children_values[0:min_len]
             #zip the parent with its child value
             for i in range(min_len):
-                children_values[i] = ([*children_values[i][0], *self_values[i]], children_values[i][1])
+                for value in value_sets[i][0]:
+                    children_values[i][0].insert(0,value)
             value_sets = children_values
 
-            logger.debug("children_values: %s", value_sets)
-        value_sets.sort(key=lambda x: sum(x[0]), reverse=True)
+            #logger.debug("children_values: %s", value_sets)
+        #value_sets.sort(key=lambda x: sum(x[0]), reverse=True)
         return value_sets
 
     def combined_values_detailed(self) -> list:
@@ -441,10 +459,10 @@ class RecipeTree (NodeMixin):
                 children_values[i] = ([*value_sets[i], *children_values[i]])
             value_sets = children_values[0:min_len]
 
-            logger.debug("children_values: %s", value_sets)
+            #logger.debug("children_values: %s", value_sets)
         return value_sets
 
-    def optimal_trade_with_counters(self)->(list,int,float, int, int):
+    def optimal_trade_with_counters(self)->(list,int,float, int, int, list):
         """
         :return: a tuple:
         * first element is the list of deals in the optimal trade;
@@ -459,6 +477,7 @@ class RecipeTree (NodeMixin):
         kmax = 0
         optimal_trade_count = 0
         optimal_trade_values_GFT = 0
+        categories_counters = {}
         for value in optimal_trade_values:
             if value[1]['counter'] > 0:
                 if kmin > value[1]['counter']:
@@ -467,7 +486,8 @@ class RecipeTree (NodeMixin):
                     kmax = value[1]['counter']
                 optimal_trade_count += 1
                 optimal_trade_values_GFT += sum(value[0])
-        return optimal_trade_values, optimal_trade_count, optimal_trade_values_GFT, kmin, kmax
+            categories_counters[str(value[1]['index'])] = value[1]['counter']
+        return optimal_trade_values, optimal_trade_count, optimal_trade_values_GFT, kmin, kmax, categories_counters
 
     def optimal_trade(self)->(list,int,float):
         """
@@ -541,19 +561,19 @@ class RecipeTree (NodeMixin):
         >>> RecipeTree(categories, [8, [6, None]], agent_counts).largest_categories(indices=True)[-1]
         [8]
         >>> RecipeTree(categories, [6, [8, [7,None]]], agent_counts).largest_categories(indices=True)[-1]
-        [7]
-        >>> RecipeTree(categories, [7, [8, [6,None]]], agent_counts).largest_categories(indices=True)[-1]
         [8]
+        >>> RecipeTree(categories, [7, [8, [6,None]]], agent_counts).largest_categories(indices=True)[-1]
+        [7]
         >>> RecipeTree(categories, [7, [8, [5, [6,None]]]], agent_counts).largest_categories(indices=True)[-1]
-        [5]
+        [7]
         >>> RecipeTree(categories, [6, [3, None, 4, [2,None]]], agent_counts).largest_categories(indices=True)[-1]  # OLD:[6] NEW:[3,4]
         [3, 2]
         >>> RecipeTree(categories, [6, [3, None, 2, [4,None]]], agent_counts).largest_categories(indices=True)[-1]
         [3, 4]
         >>> RecipeTree(categories, [6, [3, None, 7, [5,None]]], agent_counts).largest_categories(indices=True)[-1]
-        [3, 5]
-        >>> RecipeTree(categories, [6, [3, None, 5, [7,None]]], agent_counts).largest_categories(indices=True)[-1]
         [3, 7]
+        >>> RecipeTree(categories, [6, [3, None, 5, [7,None]]], agent_counts).largest_categories(indices=True)[-1]
+        [3, 5]
         >>> RecipeTree(categories, [5, [6, [4,None], 4, [6,None]]], agent_counts).largest_categories(indices=True)[-1]
         [4, 6]
         >>> RecipeTree(categories, [7, [6, [4,None], 4, [6,None]]], agent_counts).largest_categories(indices=True)[-1]
@@ -605,13 +625,13 @@ class RecipeTree (NodeMixin):
         [3]
         >>> x=categories[3].values.pop()
         >>> tree.largest_categories(indices=True)[-1]
-        [3]
+        [2]
         """
         self_category_size = self.category.size() / self.agent_count
         self_category_index_or_name = self.category_index if indices else self.name
         self_agent_count = self.agent_count
 
-        children_category_size = sum([ceil(child.category.size() / child.agent_count) for child in self.children], 0)
+        children_category_size = sum([floor(child.category.size() / child.agent_count) for child in self.children], 0)
         # print("self_category_size: ",self_category_size)
         # print("children_category_size: ",children_category_size)
         if self_category_size > children_category_size or children_category_size==0:
@@ -623,8 +643,8 @@ class RecipeTree (NodeMixin):
             children_largest_categories = []
             for child in self.children:
                 (child_largest_category_size, child_combined_category_size, child_largest_categories) = child.largest_categories(indices=indices)
-                children_largest_category_size = max(children_largest_category_size,child_largest_category_size)
-                children_combined_category_size += child_combined_category_size
+                children_largest_category_size = max(children_largest_category_size, child_largest_category_size)
+                children_combined_category_size += floor(child_combined_category_size)
                 children_largest_categories += child_largest_categories
             largest_category_size = children_largest_category_size
             combined_category_size = self_category_size
@@ -647,7 +667,7 @@ class RecipeTree (NodeMixin):
 
 
     def num_of_deals_explained(self, prices:List[float], add_num_of_overall_deals=True)-> tuple[
-        Union[int, Any], str, Any, Any]:
+        Union[int, Any], str, Any, Any, Any]:
         """
         Return a detailed explanation of the number of deals done,
         including what categories require randomization.
@@ -655,6 +675,8 @@ class RecipeTree (NodeMixin):
         """
         self_num_of_deals = floor(self.category.size() / self.agent_count)
         self_price = prices[self.category_index]
+        path_counters = {}
+        path_counters[str(self.category_index)] = self_num_of_deals
         if len(self.children) == 0:
             num_of_deals = self_num_of_deals
             explanation = "{}: {} potential deals, price={}\n".format(self.name, self_num_of_deals, self_price)
@@ -666,6 +688,9 @@ class RecipeTree (NodeMixin):
             children_num_of_deals = [t[0] for t in children_num_of_deals_explained]
             children_kmins = [t[2] for t in children_num_of_deals_explained if t[2] > 0]
             children_kmaxs = [t[3] for t in children_num_of_deals_explained]
+            for t in children_num_of_deals_explained:
+                path_counters.update(t[4])
+
             sum_children_num_of_deals = sum(children_num_of_deals)
             kmin = min(children_kmins) if len(children_kmins) > 0 else 0
             kmax = max(children_kmaxs)
@@ -677,16 +702,16 @@ class RecipeTree (NodeMixin):
             num_of_deals = min(sum_children_num_of_deals,self_num_of_deals)
             explanation = "".join(children_explanations)
             if num_of_deals==self_num_of_deals:
-                explanation += "{}: all {} traders selected, price={}\n".format(self.name, self.category.size(), self_price)
+                explanation += "{}: all {} remaining traders selected, price={}\n".format(self.name, self.category.size(), self_price)
             else:
-                explanation += "{}: {} out of {} traders selected, price={}\n".format(self.name, num_of_deals * self.agent_count, self.category.size(), self_price)
+                explanation += "{}: {} out of {} remaining traders selected, price={}\n".format(self.name, num_of_deals * self.agent_count, self.category.size(), self_price)
             if num_of_deals == sum_children_num_of_deals:
-                explanation += "{}: all {} deals selected\n".format(sum_children_names, sum_children_num_of_deals)
+                explanation += "({}): all {} remaining deals selected\n".format(sum_children_names, sum_children_num_of_deals)
             else:
-                explanation += "{}: {} out of {} deals selected\n".format(sum_children_names, num_of_deals, sum_children_num_of_deals)
+                explanation += "({}): {} out of {} remaining deals selected\n".format(sum_children_names, num_of_deals, sum_children_num_of_deals)
         if add_num_of_overall_deals:
             explanation += "{} deals overall\n".format(num_of_deals)
-        return (num_of_deals,explanation, kmin, kmax)
+        return (num_of_deals,explanation, kmin, kmax, path_counters)
 
 
 

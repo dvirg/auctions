@@ -42,7 +42,7 @@ from tee_table.tee_table import TeeTable
 from collections import OrderedDict
 from tree_calculations import get_agents_analyze, get_children_counts
 from ascending_auction_recipetree_integer_protocol import budget_balanced_ascending_auction
-from ascending_auction_recipetree_protocol import TradeWithMultipleRecipes
+from ascending_auction_recipetree_integer_protocol import TradeWithMultipleRecipes
 from recipetree_integer import RecipeTree
 
 def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_agents:list, num_of_iterations:int,
@@ -81,17 +81,25 @@ def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_a
             market = Market(agents)
             #print(agents)
             recipe_tree = RecipeTree(market.categories, recipe, recipe_tree_agent_counts)
-            optimal_trade, optimal_count, optimal_gft, kmin, kmax = recipe_tree.optimal_trade_with_counters()
+            optimal_trade, optimal_count, optimal_gft, kmin, kmax, categories_optimal_counters = recipe_tree.optimal_trade_with_counters()
+            #print('counters:' + str(categories_counters))
             #print('optimal trade:', optimal_trade, optimal_count, optimal_gft)
             auction_trade = budget_balanced_ascending_auction(market, recipe, recipe_tree_agent_counts)
             auction_count = auction_trade.num_of_deals()
+            path_counters = auction_trade.path_counters
             gft = auction_trade.gain_from_trade()
-            if optimal_count > 0 and gft < optimal_gft * (kmin - 1)/(kmin + 2):
+            print('Compare:', categories_optimal_counters, path_counters)
+            for counter in categories_optimal_counters.keys():
+                if categories_optimal_counters[counter] != path_counters[counter]:
+                    print('Warning counters', str(counter), 'are not in same size!', categories_optimal_counters[counter], '!=', path_counters[counter])
+            #for i in range(len(path_counters)):
+            #    print('Compare:', categories_optimal_counters, path_counters)
+            #if optimal_count > 0 and gft < optimal_gft * (kmin - 1)/(kmin + 2):
                 #the auction count is less more than 1 than the optimal count.
-                print('Warning GFT!!!', 'optimal_count:', optimal_count, 'auction_count:', auction_count,
-                      'num_of_possible_ps:', nums_of_agents[i], 'optimal_gft:', optimal_gft, 'gft:', gft, 'lower bound:', optimal_gft * (1 - 1/optimal_count))
-                if nums_of_agents[i] < 20:
-                    print(market.categories)
+            #    print('Warning GFT!!!', 'optimal_count:', optimal_count, 'auction_count:', auction_count,
+            #          'num_of_possible_ps:', nums_of_agents[i], 'optimal_gft:', optimal_gft, 'gft:', gft, 'lower bound:', optimal_gft * (1 - 1/optimal_count))
+            #    if nums_of_agents[i] < 20:
+            #        print(market.categories)
 
             sum_optimal_count += optimal_count
             sum_auction_count += auction_count

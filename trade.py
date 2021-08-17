@@ -30,6 +30,12 @@ class Trade:
         """
         pass
 
+    def path_counters(self) -> Any:
+        """
+        :return: count of deals on each category (k_g).
+        """
+        pass
+
     def gain_from_trade(self)->float:
         """
         :return: the expected gain-from-trade resulting from doing the deals in this Trade.
