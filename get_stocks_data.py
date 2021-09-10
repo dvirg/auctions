@@ -11,12 +11,13 @@ import pandas as pd
 from os import listdir
 from os.path import isfile, join
 import random
-STOCKS = join('stock', 'stocks')
+import pickle
+STOCKS = 'stocks'#join('stock', 'stocks')
 POSITIVE_TYPES = ['High', 'Close']
 NEGATIVE_TYPES = ['Open', 'Low']
 TYPES = [*POSITIVE_TYPES, *NEGATIVE_TYPES]
 keep_all_prices = {}
-STOCKS = 'C:\\Users\\dg1813\\Documents\\GitHub\\auctions\\stock\\stocks'
+STOCKS = 'C:\\Users\\dg1813\\Documents\\GitHub\\auctions\\stocks'#'C:\\Users\\dg1813\\Documents\\GitHub\\auctions\\stock\\stocks'
 
 def getPrices(stockFile:str, recipe:tuple):
     df = pd.read_csv(stockFile)
@@ -78,8 +79,15 @@ def getAllPricesShuffled(stockFile:str, stockName):
 #print(getAllPricesShuffled(join('stocks\\A.csv')))
 
 def getStocksPricesShuffled():
+    if isfile('stocks_prices.pkl'):
+        with open('stocks_prices.pkl', 'rb') as f:
+            return pickle.load(f)
     onlyfiles = [f for f in listdir(STOCKS) if isfile(join(STOCKS, f))]
-    return [getAllPricesShuffled(join(STOCKS, stockFile), stockFile[0:-4]) for stockFile in onlyfiles], [f[0:-4] for f in onlyfiles]
+    stocks_prices = [getAllPricesShuffled(join(STOCKS, stockFile), stockFile[0:-4]) for stockFile in onlyfiles], [f[0:-4] for f in onlyfiles]
+    with open('stocks_prices.pkl', 'wb') as f:
+        pickle.dump(stocks_prices, f)
+    return stocks_prices
+
 #print(getStocksPricesShuffled())
 def getStocksPrices(recipe:tuple):
     onlyfiles = [f for f in listdir(STOCKS) if isfile(join(STOCKS, f))]

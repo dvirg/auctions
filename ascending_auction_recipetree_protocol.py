@@ -91,10 +91,10 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
     >>>
     >>> market = Market([AgentCategory("buyer", [27.,21., 17.,11., 3.]), AgentCategory("seller", [-4.0, -5.0, -11.0]), AgentCategory("A", [-2.0, -3.0, -11.0]), AgentCategory("B", [-1.0, -2.0, -8.0])])
     >>> print(market); print(budget_balanced_ascending_auction(market, recipe_1100_1011))
-    Traders: [buyer: [27.0, 21.0, 17.0, 11.0], seller: [-4.0, -5.0], A: [-2.0, -3.0], B: [-1.0, -2.0]]
+    Traders: [buyer: [27.0, 21.0, 17.0, 11.0, 3.0], seller: [-4.0, -5.0, -11.0], A: [-2.0, -3.0, -11.0], B: [-1.0, -2.0, -8.0]]
     seller: 1 potential deals, price=-5.0
     B: 1 potential deals, price=-2.0
-    A: all 1 traders selected, price=-3.0
+    A: 1 out of 2 traders selected, price=-3.0
     B: all 1 traders selected
     buyer: 2 out of 4 traders selected, price=5.0
     seller + A: all 2 traders selected
@@ -182,13 +182,19 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
             logger.info(remaining_market)
             return TradeWithMultipleRecipes(remaining_market.categories, recipe_tree, map_category_index_to_price)
 
-        for category_index in range(market.num_categories):
-            category = remaining_market.categories[category_index]
-            if map_category_index_to_price[category_index] is not None \
-                and category.size()>0 \
-                and category.lowest_agent_value() <= map_category_index_to_price[category_index]:
-                    category.remove_lowest_agent()
-                    logger.info("{} after: {} agents remain".format(category.name, category.size()))
+        remove_lowest_agent(market, remaining_market, map_category_index_to_price, indices_of_prices_to_increase)
+
+def remove_lowest_agent(market, remaining_market, map_category_index_to_price, indices_of_prices_to_increase):
+    for category_index in range(market.num_categories):
+        if category_index not in indices_of_prices_to_increase:
+            continue
+        category = remaining_market.categories[category_index]
+        if map_category_index_to_price[category_index] is not None \
+            and category.size()>0 \
+            and category.lowest_agent_value() <= map_category_index_to_price[category_index]:
+                category.remove_lowest_agent()
+                logger.info("{} after: {} agents remain".format(category.name, category.size()))
+                return
 
 
 

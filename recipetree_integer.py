@@ -15,7 +15,7 @@ import logging, sys, collections
 from math import ceil, floor
 
 logger = logging.getLogger(__name__)
-
+INFINITY_POSITIVE = 99999
 
 # Code from https://stackoverflow.com/a/2158532/827927
 def flatten(l):
@@ -31,6 +31,66 @@ class RecipeTree (NodeMixin):
     """
     A tree in which each node is an agent category,
     and each path from root to leaf is a recipe.
+
+    >>> buyer = AgentCategory("buyer", [101,101,101])
+    >>> seller1 = AgentCategory("seller1", [-1,-90])
+    >>> seller2 = AgentCategory("seller2", [-1,-90])
+    >>> seller = AgentCategory("seller", [-50, -50, -50, -50, -50, -50])
+    >>> categories = [buyer, seller1, seller2, seller]  # Indices: 0, 1, 2, 3
+
+    >>> tree = RecipeTree(categories, [0, [1, None, 2, None, 3, None]], [1, 2, 2, 2])  # buyer
+    >>> tree.combined_values()
+    [[101, -1, -90], [101, -1, -90], [101, -50, -50]]
+    >>> tree.combined_values_detailed()
+    [[101, -1, -90], [101, -1, -90], [101, -50, -50]]
+    >>> tree.combined_values_detailed_with_counters()
+    [([101, -1, -90], {'counter': 0, 'index': 1}), ([101, -1, -90], {'counter': 0, 'index': 2}), ([101, -50, -50], {'counter': 0, 'index': 3})]
+    >>> tree.optimal_trade_GFT()
+    21
+    >>> tree.largest_categories()[-1]
+    ['seller1', 'seller2', 'seller']
+    >>> tree.paths_to_leaf()
+    [['buyer', 'seller1'], ['buyer', 'seller2'], ['buyer', 'seller']]
+    >>> tree.num_of_deals()
+    3
+    >>> print(tree.num_of_deals_explained(prices=[100,-50,-50,-50])[1])
+    seller1: 1 potential deals, price=-50
+    seller2: 1 potential deals, price=-50
+    seller: 3 potential deals, price=-50
+    buyer: all 3 remaining traders selected, price=100
+    (seller1 + seller2 + seller): 3 out of 5 remaining deals selected
+    3 deals overall
+    <BLANKLINE>
+
+    >>> buyer = AgentCategory("buyer", [101,101,101,101,101])
+    >>> seller1 = AgentCategory("seller1", [-1,-90])
+    >>> seller2 = AgentCategory("seller2", [-1,-90])
+    >>> seller = AgentCategory("seller", [-50, -50, -50, -50, -50, -50])
+    >>> categories = [buyer, seller1, seller2, seller]  # Indices: 0, 1, 2, 3
+
+    >>> tree = RecipeTree(categories, [0, [1, None, 2, None, 3, None]], [1, 2, 2, 2])  # buyer
+    >>> tree.combined_values()
+    [[101, -1, -90], [101, -1, -90], [101, -50, -50], [101, -50, -50], [101, -50, -50]]
+    >>> tree.combined_values_detailed()
+    [[101, -1, -90], [101, -1, -90], [101, -50, -50], [101, -50, -50], [101, -50, -50]]
+    >>> tree.combined_values_detailed_with_counters()
+    [([101, -1, -90], {'counter': 0, 'index': 1}), ([101, -1, -90], {'counter': 0, 'index': 2}), ([101, -50, -50], {'counter': 0, 'index': 3}), ([101, -50, -50], {'counter': 0, 'index': 3}), ([101, -50, -50], {'counter': 0, 'index': 3})]
+    >>> tree.optimal_trade_GFT()
+    23
+    >>> tree.largest_categories()[-1]
+    ['seller1', 'seller2', 'seller']
+    >>> tree.paths_to_leaf()
+    [['buyer', 'seller1'], ['buyer', 'seller2'], ['buyer', 'seller']]
+    >>> tree.num_of_deals()
+    5
+    >>> print(tree.num_of_deals_explained(prices=[100,-50.5,-50.5,-50.5])[1])
+    seller1: 1 potential deals, price=-50.5
+    seller2: 1 potential deals, price=-50.5
+    seller: 3 potential deals, price=-50.5
+    buyer: all 5 remaining traders selected, price=100
+    (seller1 + seller2 + seller): all 5 remaining deals selected
+    5 deals overall
+    <BLANKLINE>
 
     >>> buyer = AgentCategory("buyer", [60,40,20,-30])
     >>> seller = AgentCategory("seller", [-10,-30,-50])
@@ -473,7 +533,7 @@ class RecipeTree (NodeMixin):
         optimal_trade_values = [t for t in values if sum(t[0])>=0]
         for value in optimal_trade_values:
             value[1]['counter'] += 1
-        kmin = optimal_trade_values[0][1]['counter'] if len(optimal_trade_values) > 0 else 99999
+        kmin = optimal_trade_values[0][1]['counter'] if len(optimal_trade_values) > 0 else INFINITY_POSITIVE
         kmax = 0
         optimal_trade_count = 0
         optimal_trade_values_GFT = 0
@@ -487,6 +547,8 @@ class RecipeTree (NodeMixin):
                 optimal_trade_count += 1
                 optimal_trade_values_GFT += sum(value[0])
             categories_counters[str(value[1]['index'])] = value[1]['counter']
+        if kmin == INFINITY_POSITIVE:
+            kmin = kmax
         return optimal_trade_values, optimal_trade_count, optimal_trade_values_GFT, kmin, kmax, categories_counters
 
     def optimal_trade(self)->(list,int,float):
@@ -692,8 +754,8 @@ class RecipeTree (NodeMixin):
                 path_counters.update(t[4])
 
             sum_children_num_of_deals = sum(children_num_of_deals)
-            kmin = min(children_kmins) if len(children_kmins) > 0 else 0
             kmax = max(children_kmaxs)
+            kmin = min(children_kmins) if len(children_kmins) > 0 else 0
             # logger.debug(children_num_of_deals)
             children_explanations = [t[1] for t in children_num_of_deals_explained]
             # logger.debug(children_explanations)

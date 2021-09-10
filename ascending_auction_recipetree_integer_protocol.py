@@ -94,6 +94,31 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
     >>> agent_counts = [1, 2, 1, 2]
     >>> recipe_1100_1011 = [0, [1, None, 2, [3, None]]]
     >>>
+    >>> market = Market([AgentCategory("buyer", [101,101,101,101,101]), AgentCategory("seller1", [-1,-90]), AgentCategory("seller2", [-1,-90]), AgentCategory("seller", [-50, -50, -50, -50, -50, -50])])
+    >>> RecipeTree(market.categories, [0, [1, None, 2, None, 3, None]], [1,2,2,2]).optimal_trade_with_counters()
+    ([([101, -1, -90], {'counter': 1, 'index': 1}), ([101, -1, -90], {'counter': 1, 'index': 2}), ([101, -50, -50], {'counter': 3, 'index': 3}), ([101, -50, -50], {'counter': 3, 'index': 3}), ([101, -50, -50], {'counter': 3, 'index': 3})], 5, 23, 1, 3, {'1': 1, '2': 1, '3': 3})
+    >>> print(market); print(budget_balanced_ascending_auction(market, [0, [1, None, 2, None, 3, None]], [1,2,2,2]))
+    Traders: [buyer: [101, 101, 101, 101, 101], seller1: [-1, -90], seller2: [-1, -90], seller: [-50, -50, -50, -50, -50, -50]]
+    seller1: 0 potential deals, price=-50.5
+    seller2: 0 potential deals, price=-50.5
+    seller: 3 potential deals, price=-50.5
+    buyer: all 3 remaining traders selected, price=101.0
+    (seller1 + seller2 + seller): all 3 remaining deals selected
+    3 deals overall
+
+    >>> market = Market([AgentCategory("buyer", [101,101,101]), AgentCategory("seller1", [-1,-90]), AgentCategory("seller2", [-1,-90]), AgentCategory("seller", [-50, -50, -50, -50, -50, -50])])
+    >>> RecipeTree(market.categories, [0, [1, None, 2, None, 3, None]], [1,2,2,2]).optimal_trade_with_counters()
+    ([([101, -1, -90], {'counter': 1, 'index': 1}), ([101, -1, -90], {'counter': 1, 'index': 2}), ([101, -50, -50], {'counter': 1, 'index': 3})], 3, 21, 1, 1, {'1': 1, '2': 1, '3': 1})
+    >>> print(market); print(budget_balanced_ascending_auction(market, [0, [1, None, 2, None, 3, None]], [1,2,2,2]))
+    Traders: [buyer: [101, 101, 101], seller1: [-1, -90], seller2: [-1, -90], seller: [-50, -50, -50, -50, -50, -50]]
+    seller1: 0 potential deals, price=-50.0
+    seller2: 0 potential deals, price=-50.0
+    seller: 2 potential deals, price=-50.0
+    buyer: 2 out of 3 remaining traders selected, price=100.0
+    (seller1 + seller2 + seller): all 2 remaining deals selected
+    2 deals overall
+
+
     >>> market = Market([AgentCategory("buyer", [27.,21., 17.,11., 3.]), AgentCategory("seller", [-4.0, -5.0, -11.0]), AgentCategory("A", [-2.0, -3.0, -11.0]), AgentCategory("B", [-1.0, -2.0, -8.0])])
     >>> RecipeTree(market.categories, recipe_1100_1011, agent_counts).optimal_trade_with_counters()
     ([([27.0, -2.0, -1.0, -2.0], {'counter': 1, 'index': 3}), ([21.0, -4.0, -5.0], {'counter': 1, 'index': 1})], 2, 34.0, 1, 1, {'3': 1, '1': 1})
@@ -191,14 +216,20 @@ def budget_balanced_ascending_auction(market:Market, ps_recipe_struct: List[Any]
             logger.info(remaining_market)
             return TradeWithMultipleRecipes(remaining_market.categories, recipe_tree, map_category_index_to_price, agent_counts)
 
-        for category_index in range(market.num_categories):
-            category = remaining_market.categories[category_index]
-            if map_category_index_to_price[category_index] is not None \
-                and category.size()>0 \
-                and category.lowest_agent_value() <= map_category_index_to_price[category_index]:
-                    category.remove_lowest_agent()
-                    logger.info("{} after: {} agents remain".format(category.name, category.size()))
-                    break
+        remove_lowest_agent(market, remaining_market, map_category_index_to_price, indices_of_prices_to_increase)
+
+def remove_lowest_agent(market, remaining_market, map_category_index_to_price, indices_of_prices_to_increase):
+    for category_index in range(market.num_categories):
+        if category_index not in indices_of_prices_to_increase:
+            continue
+        category = remaining_market.categories[category_index]
+        if map_category_index_to_price[category_index] is not None \
+            and category.size() > 0 \
+            and category.lowest_agent_value() <= map_category_index_to_price[category_index]:
+                category.remove_lowest_agent()
+                logger.info("{} after: {} agents remain".format(category.name, category.size()))
+                return
+    logger.error("Should have remove someone, and didn't remove: {}, {}, {}, {}", market, remaining_market, map_category_index_to_price, indices_of_prices_to_increase)
 
 
 
