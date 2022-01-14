@@ -44,6 +44,7 @@ from tree_calculations import get_agents_analyze, get_children_counts
 from ascending_auction_recipetree_integer_protocol import budget_balanced_ascending_auction
 from ascending_auction_recipetree_integer_protocol import TradeWithMultipleRecipes
 from recipetree_integer import RecipeTree
+from datetime import datetime
 
 def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_agents:list, num_of_iterations:int,
                agent_counts:list, agent_values:list, recipe_tree_agent_counts: list, num_recipes: int):
@@ -62,12 +63,15 @@ def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_a
                      "auctioncount", "auctionkmin", "auctionkmax", "countratio",
                      "optimalgft", "auctiongft", "gftratio"]
     print('recipe:', recipe, 'size:', num_recipes)
-    ROUND = 2#5
+    GFT_ROUND = 1 - 1
+    K_ROUND = 2 - 1
+    RATIO_ROUND = 3 - 1
     results_table = TeeTable(TABLE_COLUMNS, results_csv_file)
     recipe_str = str(recipe).replace(',', '-')
     is_binary = len(set(recipe_tree_agent_counts)) == 1
 
     for i in range(len(nums_of_agents)):
+        now = datetime.now()
         sum_optimal_count = sum_auction_count = sum_optimal_kmin = sum_optimal_kmax = 0  # count the number of deals done in the optimal vs. the actual auction.
         sum_optimal_gft = sum_auction_total_gft = sum_auction_kmin = sum_auction_kmax = 0
         for iteration in range(num_of_iterations):
@@ -130,26 +134,42 @@ def experiment(results_csv_file: str, recipe: list, value_ranges:list, nums_of_a
         # print("GFT of {}: {:.2f} / {:.2f} = {:.2f}%".format(title, sum_auction_gft, sum_optimal_gft, 0 if sum_optimal_gft==0 else sum_auction_gft * 100 / sum_optimal_gft))
         kmin_mean = sum_optimal_kmin/num_of_iterations
         if is_binary:
-            gft_formula = round((kmin_mean - 1) / kmin_mean * 100,
-                                ROUND) if kmin_mean - 1 > 0 else 0
+            gft_formula = int_round((kmin_mean - 1) / kmin_mean * 100 if kmin_mean - 1 > 0 else 0, RATIO_ROUND)
         else:
-            gft_formula = round((kmin_mean - num_recipes) / (kmin_mean + num_recipes) * 100,
-                                ROUND) if kmin_mean - num_recipes > 0 else 0
+            gft_formula = int_round((kmin_mean - num_recipes) / (kmin_mean + num_recipes) * 100 if kmin_mean - num_recipes > 0 else 0,RATIO_ROUND)
 
         results_table.add(OrderedDict([
             ("iterations", num_of_iterations),
             ("recipe", recipe_str),
             ("numofagents", nums_of_agents[i]),
-            ("optimalcount", round(sum_optimal_count/num_of_iterations,ROUND)),
-            ("optimalkmin", kmin_mean),
-            ("optimalkmax", round(sum_optimal_kmax/num_of_iterations,ROUND)),
+            ("optimalcount", int_round(sum_optimal_count/num_of_iterations,K_ROUND)),
+            ("optimalkmin", int_round(kmin_mean, K_ROUND)),
+            ("optimalkmax", int_round(sum_optimal_kmax/num_of_iterations,K_ROUND)),
             ("gftformula", gft_formula),
-            ("auctioncount", round(sum_auction_count/num_of_iterations,ROUND)),
-            ("auctionkmin", round(sum_auction_kmin/num_of_iterations,ROUND)),
-            ("auctionkmax", round(sum_auction_kmax/num_of_iterations,ROUND)),
-            ("countratio", 0 if sum_optimal_count==0 else round((sum_auction_count / sum_optimal_count) * 100, ROUND)),
-            ("optimalgft", round(sum_optimal_gft/num_of_iterations,ROUND)),
-            ("auctiongft", round(sum_auction_total_gft/num_of_iterations,ROUND)),
-            ("gftratio", 0 if sum_optimal_gft==0 else round(sum_auction_total_gft / sum_optimal_gft*100, ROUND)),
+            ("auctioncount", int_round(sum_auction_count/num_of_iterations,K_ROUND)),
+            ("auctionkmin", int_round(sum_auction_kmin/num_of_iterations,K_ROUND)),
+            ("auctionkmax", int_round(sum_auction_kmax/num_of_iterations,K_ROUND)),
+            ("countratio", int_round(0 if sum_optimal_count==0 else (sum_auction_count / sum_optimal_count) * 100, RATIO_ROUND)),
+            ("optimalgft", int_round(sum_optimal_gft/num_of_iterations,GFT_ROUND)),
+            ("auctiongft", int_round(sum_auction_total_gft/num_of_iterations,GFT_ROUND)),
+            ("gftratio", '0.00' if sum_optimal_gft==0 else int_round(sum_auction_total_gft / sum_optimal_gft*100, RATIO_ROUND)),
         ]))
+        print('took', (datetime.now() - now).seconds)
     results_table.done()
+
+def int_round(number, size):
+    if number == 0:
+        return '0.' + ('0' * size)
+    # power = (10 ** size)
+    # rounded = str(int(number * power) / power)
+    str_number = str(number)
+    round_split = str_number.split('.')
+    if len(round_split) == 1:
+        return str_number + '.' + ('0' * size)
+    elif len(round_split[1]) == size:
+        return str_number
+    elif len(round_split[1]) > size:
+        return round_split[0] + '.' + round_split[1][0:size]
+    else:
+        return str_number + ('0' * (size - len(round_split[1])))
+

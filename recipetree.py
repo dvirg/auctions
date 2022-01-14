@@ -304,18 +304,19 @@ class RecipeTree (NodeMixin):
         optimal_trade_values = [t for t in values if t[0]>=0]
         for value in optimal_trade_values:
             value[1]['counter'] += 1
-        kmin = optimal_trade_values[0][1]['counter'] if len(optimal_trade_values) > 0 else 99999
+        kmin = optimal_trade_values[0][1]['counter'] if len(optimal_trade_values) > 0 else 0
         kmax = 0
         optimal_trade_count = 0
         optimal_trade_values_GFT = 0
         for value in optimal_trade_values:
             if value[1]['counter'] > 0:
-                if kmin > value[1]['counter']:
+                if kmin > value[1]['counter'] or (value[1]['counter'] > 0 and kmin == 0):
                     kmin = value[1]['counter']
                 if kmax < value[1]['counter']:
                     kmax = value[1]['counter']
                 optimal_trade_count += 1
                 optimal_trade_values_GFT += value[0]
+
         return optimal_trade_values, optimal_trade_count, optimal_trade_values_GFT, kmin, kmax
 
     def optimal_trade(self)->(list,int,float):
@@ -457,10 +458,10 @@ class RecipeTree (NodeMixin):
             children_num_of_deals_explained = [child.num_of_deals_explained(prices,add_num_of_overall_deals=False) for child in self.children]
             # logger.debug(children_num_of_deals_explained)
             children_num_of_deals = [t[0] for t in children_num_of_deals_explained]
-            children_kmins = [t[2] for t in children_num_of_deals_explained]
+            children_kmins = [t[2] for t in children_num_of_deals_explained if t[2] > 0]
             children_kmaxs = [t[3] for t in children_num_of_deals_explained]
             sum_children_num_of_deals = sum(children_num_of_deals)
-            kmin = min(children_kmins)
+            kmin = min(children_kmins) if children_kmins else 0
             kmax = max(children_kmaxs)
             # logger.debug(children_num_of_deals)
             children_explanations = [t[1] for t in children_num_of_deals_explained]

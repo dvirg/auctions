@@ -23,7 +23,7 @@ nums_of_agents = [2, 4, 6, 10, 16, 26, 50, 100, 500, 1000, 2000, 5000, 10000, 20
 
 print("\n\n###### TEST MULTI RECIPE AUCTION WITH 2 paths: [(1,2,0,0),(1,0,1,2]")
 
-iterations = 100#00
+iterations = 10000
 prices = [[[400, 300, 200, 100],[-1, -11],[-2, -22],[-3, -33],[-4, -44],[-5, -55],[-6, -66]]]
 
 recipes_111 = [1, [2, [0, None]]] # buyer <- sellerB <- sellerA; [1,1,1]

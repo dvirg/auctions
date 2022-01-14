@@ -1,0 +1,5 @@
+iterations,recipe,numofagents,optimalcount,optimalkmin,optimalkmax,gftformula,auctioncount,auctionkmin,auctionkmax,countratio,optimalgft,auctiongft,gftratio
+10000,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None- 11- None- 12- None- 13- None- 14- None- 15- None- 16- None- 17- None- 18- None- 19- None]],2,0.00,0.00,0.00,0.000,0.00,0.00,0.00,0.000,0.0,0.0,0.00
+10000,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None- 11- None- 12- None- 13- None- 14- None- 15- None- 16- None- 17- None- 18- None- 19- None]],4,0.00,0.00,0.00,0.000,0.00,0.00,0.00,0.000,0.0,0.0,0.00
+10000,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None- 11- None- 12- None- 13- None- 14- None- 15- None- 16- None- 17- None- 18- None- 19- None]],6,0.00,0.00,0.00,0.000,0.00,0.00,0.00,0.000,0.0,0.0,0.00
+10000,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None- 11- None- 12- None- 13- None- 14- None- 15- None- 16- None- 17- None- 18- None- 19- None]],10,0.00,0.00,0.00,0.000,0.00,0.00,0.00,0.000,0.0,0.0,0.00

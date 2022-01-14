@@ -1,0 +1,4 @@
+iterations,recipe,numofagents,optimalcount,optimalkmin,optimalkmax,gftformula,auctioncount,auctionkmin,auctionkmax,countratio,optimalgft,auctiongft,gftratio
+10,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],1000000,90551.1,9007.5,9099.6,99.95,90550.7,9008.9,9095.6,99.99,44590364.,44590363.,99.99
+10,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],2000000,180953.1,17996.1,18175.9,99.97,180952.6,17980.1,18180.1,99.99,89176913.,89176909.,99.99
+10,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],5000000,452878.5,45179.0,45386.7,99.99,452878.0,45159.7,45386.7,99.99,222968300.,222968300.,100.00

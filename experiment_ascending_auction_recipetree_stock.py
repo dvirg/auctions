@@ -59,9 +59,13 @@ def experiment(results_csv_file: str, recipe: list, agent_counts:list, agent_val
     :param stocks_prices: list of prices for each stock and each agent.
     :param stock_names: list of stocks names which prices are belongs, for naming only.
     """
-    TABLE_COLUMNS = ["stockname", "recipe", "numpossibletrades",
+    TABLE_COLUMNS = ["stockname", "recipe", "numofagents",
                      "optimalkmin", "optimalkmax","gftformula",
-                     "optimalcount", "optimalgft", "auctioncount", "countratio", "gft", "gftratio"]
+                     "optimalcount", "optimalgft", "auctioncount",
+                     "auctionkmin", "auctionkmax", "countratio", "gft", "gftratio"]
+    GFT_ROUND = 1
+    K_ROUND = 2
+    RATIO_ROUND = 3
     print('recipe:', recipe)
     results_table = TeeTable(TABLE_COLUMNS, results_csv_file)
     recipe_str = str(recipe).replace(',', '->')
@@ -98,6 +102,8 @@ def experiment(results_csv_file: str, recipe: list, agent_counts:list, agent_val
                 #print('optimal trade:', optimal_trade, optimal_count, optimal_gft)
                 auction_trade = budget_balanced_ascending_auction(market, recipe)
                 auction_count = auction_trade.num_of_deals()
+                auction_kmin = auction_trade.min_num_of_deals()
+                auction_kmax = auction_trade.max_num_of_deals()
                 gft = auction_trade.gain_from_trade()
                 #if auction_count < optimal_count - 1:
                 #    #the auction count is less more than 1 than the optimal count.
@@ -118,12 +124,14 @@ def experiment(results_csv_file: str, recipe: list, agent_counts:list, agent_val
                         print(market.categories)
                 results = [("stockname", stock_names[i]),
                            ("recipe", recipe_str),
-                           ("numpossibletrades", num_of_possible_ps),
+                           ("numofagents", num_of_possible_ps),
                            ("optimalcount", optimal_count),
                            ("optimalkmin", kmin),
                            ("optimalkmax", kmax),
                            ("optimalgft", optimal_gft),
                            ("auctioncount", auction_count),
+                           ("auctionkmin", auction_kmin),
+                           ("auctionkmax", auction_kmax),
                            ("countratio", 0 if optimal_count==0 else auction_count / optimal_count*100),
                            ("gft", gft),
                            ("gftratio", 0 if optimal_gft==0 else gft / optimal_gft*100)
@@ -141,17 +149,38 @@ def experiment(results_csv_file: str, recipe: list, agent_counts:list, agent_val
         kmin = 0
         for index in range(len(results)):
             if index > 2:
+                if 'ratio' in results[index][0]:
+                   results[index] = (results[index][0], int_round(results[index][1] / len(stock_names) / num_of_iterations, RATIO_ROUND))
+                elif 'gft' in results[index][0]:
+                   results[index] = (results[index][0], int_round(results[index][1] / len(stock_names) / num_of_iterations / 100, GFT_ROUND))
+                else:
+                    if results[index][0] == 'optimalkmin':
+                        kmin = results[index][1] / len(stock_names) / num_of_iterations
+                    results[index] = (results[index][0], int_round(results[index][1] / len(stock_names) / num_of_iterations, K_ROUND))
                 #if 'ratio' in results[index][0]:
                 #    results[index] = (results[index][0], results[index][1]/len(stock_names))
                 #elif 'count' in results[index][0]:
                 #    results[index] = (results[index][0], results[index][1]/len(stock_names))
                 #else:
-                results[index] = (results[index][0], results[index][1]/len(stock_names)/num_of_iterations)
             elif index == 0:
                 results[index] = (results[index][0], 'Average')
-            if results[index][0] == 'optimalkmin':
-                kmin = results[index][1]
-        results.append(('gftformula', 0 if kmin <= 1 else (1-1/kmin)*100))
+        results.append(('gftformula', int_round(0 if kmin <= 1 else (1-1/kmin) * 100, RATIO_ROUND)))
         results_table.add(OrderedDict(results))
     results_table.done()
 
+
+def int_round(number, size):
+    if number == 0:
+        return '0.' + ('0' * size)
+    # power = (10 ** size)
+    # rounded = str(int(number * power) / power)
+    str_number = str(number)
+    round_split = str_number.split('.')
+    if len(round_split) == 1:
+        return str_number + '.' + ('0' * size)
+    elif len(round_split[1]) == size:
+        return str_number
+    elif len(round_split[1]) > size:
+        return round_split[0] + '.' + round_split[1][0:size]
+    else:
+        return str_number + ('0' * (size - len(round_split[1])))

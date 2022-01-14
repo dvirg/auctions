@@ -1,0 +1,16 @@
+iterations,recipe,numofagents,optimalcount,optimalkmin,optimalkmax,gftformula,auctioncount,auctionkmin,auctionkmax,countratio,optimalgft,auctiongft,gftratio
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],20,0.0,0.0,0.0,0.00,0.0,0.0,0.0,0.00,3,0,0.00
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],50,3.7,0.9,0.9,0.00,0.0,0.0,0.0,2.42,768,49,6.50
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],100,9.6,1.0,1.1,0.00,4.6,1.0,1.0,48.34,3949,2572,65.13
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],500,45.1,3.6,5.5,28.82,41.1,3.0,5.1,91.16,22369,22165,99.08
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],1000,90.3,7.7,10.3,58.84,86.1,7.2,9.9,95.29,44523,44420,99.76
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],2000,180.2,16.0,19.9,77.83,175.9,15.5,19.5,97.61,89245,89189,99.93
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],5000,451.5,42.1,48.1,90.93,447.1,41.7,47.7,99.04,223104,223082,99.99
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],10000,901.8,85.7,94.5,95.44,897.7,85.3,94.1,99.55,446385,446371,99.99
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],20000,1802.9,174.3,186.2,97.73,1799.6,174.0,186.0,99.81,892285,892273,99.99
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],50000,4512.8,441.1,461.2,99.09,4510.3,441.0,461.0,99.94,2230206,2230193,99.99
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],100000,9024.3,888.6,916.9,99.55,9022.9,888.4,917.1,99.98,4456886,4456876,99.99
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],200000,18072.0,1786.2,1828.3,99.77,18070.8,1785.7,1828.2,99.99,8919549,8919540,99.99
+100,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],500000,45203.4,4483.9,4555.0,99.91,45202.8,4483.9,4554.6,99.99,22294888,22294881,99.99
+10,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],1000000,90551.1,9007.5,9099.6,99.95,90550.7,9008.9,9095.6,99.99,44590364,44590363,99.99
+10,[0- [1- None- 2- None- 3- None- 4- None- 5- None- 6- None- 7- None- 8- None- 9- None- 10- None]],2000000,180953.1,17996.1,18175.9,99.97,180952.6,17980.1,18180.1,99.99,89176913,89176909,99.99

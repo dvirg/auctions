@@ -64,7 +64,9 @@ def experiment(results_csv_file: str, recipe: list, nums_of_agents:list, num_of_
                      "optimalcount", "optimalgft", "auctioncount",
                      "auctionkmin", "auctionkmax", "countratio", "gft", "gftratio"]
     print('recipe:', recipe, 'size:', num_recipes)
-    ROUND = 2#5
+    GFT_ROUND = 1
+    K_ROUND = 2
+    RATIO_ROUND = 3
     results_table = TeeTable(TABLE_COLUMNS, results_csv_file)
     recipe_str = str(recipe).replace(',', '->')
     stocks_prices, stock_names = getStocksPricesShuffled()
@@ -126,7 +128,7 @@ def experiment(results_csv_file: str, recipe: list, nums_of_agents:list, num_of_
                            ("optimalcount", optimal_count),
                            ("optimalkmin", kmin),
                            ("optimalkmax", kmax),
-                           ("gftformula", 0 if kmin <= num_recipes else round((kmin - num_recipes) / (kmin + num_recipes) * 100, ROUND)),
+                           ("gftformula", 0 if kmin <= num_recipes else (kmin - num_recipes) / (kmin + num_recipes) * 100),
                            ("optimalgft", optimal_gft),
                            ("auctioncount", auction_count),
                            ("auctionkmin", auction_kmin),
@@ -148,25 +150,41 @@ def experiment(results_csv_file: str, recipe: list, nums_of_agents:list, num_of_
         results = total_results[str(num_of_agents_per_category)]
         kmin = 0
         for index in range(len(results)):
+            if results[index][0] == 'optimalkmin':
+                kmin = results[index][1] / len(stock_names) / num_of_iterations
             if index > 2:
-                # if 'ratio' in results[index][0]:
-                #    results[index] = (results[index][0], results[index][1]/len(stock_names))
-                # elif 'count' in results[index][0]:
-                #    results[index] = (results[index][0], results[index][1]/len(stock_names))
-                # else:
-                results[index] = (results[index][0], round(results[index][1] / len(stock_names) / num_of_iterations, ROUND))
+                if 'ratio' in results[index][0]:
+                   results[index] = (results[index][0], int_round(results[index][1] / len(stock_names) / num_of_iterations, RATIO_ROUND))
+                elif 'gft' in results[index][0]:
+                   results[index] = (results[index][0], int_round(results[index][1] / len(stock_names) / num_of_iterations / 100, GFT_ROUND))
+                else:
+                    results[index] = (results[index][0], int_round(results[index][1] / len(stock_names) / num_of_iterations, K_ROUND))
             elif index == 0:
                 results[index] = (results[index][0], 'Average')
-            if results[index][0] == 'optimalkmin':
-                kmin = results[index][1]
             if results[index][0] == 'gftformula':
                 if is_binary:
-                    gft_formula = 0 if kmin <= 1 else round((kmin - 1) / kmin * 100, ROUND)
+                    gft_formula = int_round(0 if kmin <= 1 else (kmin - 1) / kmin * 100, RATIO_ROUND)
                 else:
-                    gft_formula = 0 if kmin <= num_recipes else round((kmin - num_recipes) / (kmin + num_recipes) * 100, ROUND)
+                    gft_formula = int_round(0 if kmin <= num_recipes else (kmin - num_recipes) / (kmin + num_recipes) * 100, RATIO_ROUND)
                 results[index] = (results[index][0], gft_formula)
 
         # results.append(('gftformula', 0 if kmin <= num_recipes else round((kmin - num_recipes) / (kmin + num_recipes) * 100, ROUND)))
         results_table.add(OrderedDict(results))
 
     results_table.done()
+
+def int_round(number, size):
+    if number == 0:
+        return '0.' + ('0' * size)
+    # power = (10 ** size)
+    # rounded = str(int(number * power) / power)
+    str_number = str(number)
+    round_split = str_number.split('.')
+    if len(round_split) == 1:
+        return str_number + '.' + ('0' * size)
+    elif len(round_split[1]) == size:
+        return str_number
+    elif len(round_split[1]) > size:
+        return round_split[0] + '.' + round_split[1][0:size]
+    else:
+        return str_number + ('0' * (size - len(round_split[1])))
