@@ -21,7 +21,8 @@ def hide_log():
     ascending_auction_recipetree_protocol.logger.setLevel(logging.WARNING)
     prices.logger.setLevel(logging.WARNING)
 
-hide_log()
+show_log()
+#hide_log()
 
 
 from typing import *
@@ -128,6 +129,102 @@ class TestAscendingAuctionWithTwoRecpies(unittest.TestCase):
             expected_num_of_deals=4, expected_prices=[10,-10,-10])
         check_110_101(buyers=[19,17,15,13,11,9], sellersA=[-12,-10,-8,-6,-4,-2], sellersB=[],
             expected_num_of_deals=4, expected_prices=[10,-10,None])
+
+
+    def test_market_1100_1011(self):
+        """
+        Unit-tests with two recipes: [1,1,0,0] and [1,0,1,1].
+        This is the smallest case in which multi-recipe substantially differs than single-recipe.
+        :return:
+        """
+
+        def check_1100_1011(buyers: List[float], sellers: List[float], producers: List[float], movers: List[float],
+                           expected_num_of_deals: int, expected_prices: List[float]):
+            market = Market([
+                AgentCategory("buyer", buyers),
+                AgentCategory("seller", sellers),
+                AgentCategory("producer", producers),
+                AgentCategory("mover", movers),
+            ])
+            # ps_recipes = [[1, 1, 0, 0], [1, 0, 1, 1]]
+            ps_recipe_struct = [0, [1, None, 2, [3, None]]]
+            self._check_market(market, ps_recipe_struct, expected_num_of_deals, expected_prices)
+
+        check_1100_1011(buyers=[19, 17, 15, 13, 11, 9], sellers=[-12, -10, -8, -6, -4, -2], producers=[], movers=[],
+            expected_num_of_deals=4, expected_prices=[10.0, -10.0, None, None])
+        # show_log()
+        check_1100_1011(buyers=[19, 17, 15, 13, 11, 9], sellers=[], producers=[-6,-5,-4,-3,-2,-1], movers=[-6,-5,-4,-3,-2,-1],
+            expected_num_of_deals=4, expected_prices=[10, None, -5, -5])
+        # hide_log()
+
+
+    def test_market_11100_10011(self):
+        """
+        Unit-tests with two recipes: [1,1,0,0] and [1,0,1,1].
+        This is the smallest case in which multi-recipe substantially differs than single-recipe.
+        :return:
+        """
+
+        def check_11100_10011(buyers: List[float], sellers1: List[float], sellers2: List[float], producers1: List[float], producers2: List[float],
+                           expected_num_of_deals: int, expected_prices: List[float]):
+            market = Market([
+                AgentCategory("buyer", buyers),
+                AgentCategory("seller1", sellers1),
+                AgentCategory("seller2", sellers2),
+                AgentCategory("producer1", producers1),
+                AgentCategory("producer2", producers2),
+            ])
+            ps_recipe_struct = [0, [1, [2, None], 3, [4, None]]]
+            self._check_market(market, ps_recipe_struct, expected_num_of_deals, expected_prices)
+
+        check_11100_10011(buyers=[400, 300, 200, 100], sellers1=[-1, -2], sellers2=[-3, -4], producers1=[-5,-6], producers2=[-7,-8],
+            expected_num_of_deals=2, expected_prices=[None, None, None, None, None])
+
+    AgentCategory("buyer", [400, 300, 200, 100]),
+    AgentCategory("seller1", [-1, -2]),
+    AgentCategory("seller2", [-3, -4]),
+    AgentCategory("producer1", [-5, -6]),
+    AgentCategory("producer2", [-7, -8]),
+
+
+class TestAscendingAuctionForHamdanyAlgo(unittest.TestCase):
+    """
+    This TestCase class runs unittests for settings
+    """
+
+    def _check_market(self, market: Market, ps_recipe_struct:List[Any], expected_num_of_deals:int, expected_prices:List[float]):
+        trade = ascending_auction_recipetree_protocol.budget_balanced_ascending_auction(market, ps_recipe_struct)
+        self.assertEqual(trade.num_of_deals(), expected_num_of_deals)
+        for i, price in enumerate(expected_prices):
+            if price is not None:
+                self.assertEqual(trade.prices[i], expected_prices[i])
+
+
+    def test_market_1_20(self):
+        """
+        Unit-tests with 20 recipes of [1,1].
+        Note that the first category is sellers and the latter category is buyers
+        :return:
+
+        >>> test = TestAscendingAuctionForHamdanyAlgo()
+        >>> test.test_market_1_20()
+        """
+
+
+        def check_1_20(sellers: List[float], buyers_lists: List[List[float]],
+                           expected_num_of_deals: int, expected_prices: List[float]):
+            market_array = [AgentCategory("seller", sellers)]
+            ps_recipe_struct = [0, []]
+            for buyers, i in zip(buyers_lists, range(len(buyers_lists))):
+                market_array.append(AgentCategory("buyer" + str(i), buyers))
+                ps_recipe_struct[1].append(i + 1)
+                ps_recipe_struct[1].append(None)
+            market = Market(market_array)
+            # ps_recipes = [[1, 1, 0], [1, 0, 1]]
+            self._check_market(market, ps_recipe_struct, expected_num_of_deals, expected_prices)
+
+        check_1_20(sellers=[0 for _ in range(10)], buyers_lists=[[i] for i in range(10, 30)],
+            expected_num_of_deals=9, expected_prices=[-20] + [20 for _ in range(10)])
 
 
     def test_market_1100_1011(self):

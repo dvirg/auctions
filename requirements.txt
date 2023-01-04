@@ -1,2 +1,4 @@
-pandas
+pandas~=1.5.2
 tee_table
+
+anytree~=2.8.0
