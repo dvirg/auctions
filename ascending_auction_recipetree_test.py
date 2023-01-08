@@ -187,7 +187,7 @@ class TestAscendingAuctionWithTwoRecpies(unittest.TestCase):
     AgentCategory("producer2", [-7, -8]),
 
 
-class TestAscendingAuctionForHamdanyAlgo(unittest.TestCase):
+class TestAscendingAuctionForThesis2023(unittest.TestCase):
     """
     This TestCase class runs unittests for settings
     """
@@ -206,8 +206,9 @@ class TestAscendingAuctionForHamdanyAlgo(unittest.TestCase):
         Note that the first category is sellers and the latter category is buyers
         :return:
 
-        >>> test = TestAscendingAuctionForHamdanyAlgo()
+        >>> test = TestAscendingAuctionForThesis2023()
         >>> test.test_market_1_20()
+        >>> test.test_market_110_101()
         """
 
 
@@ -227,31 +228,30 @@ class TestAscendingAuctionForHamdanyAlgo(unittest.TestCase):
             expected_num_of_deals=9, expected_prices=[-20] + [20 for _ in range(10)])
 
 
-    def test_market_1100_1011(self):
+    def test_market_110_101(self):
         """
-        Unit-tests with two recipes: [1,1,0,0] and [1,0,1,1].
+        Unit-tests with two recipes: [1,1,0] and [1,0,1].
         This is the smallest case in which multi-recipe substantially differs than single-recipe.
         :return:
         """
 
-        def check_1100_1011(buyers: List[float], sellers: List[float], producers: List[float], movers: List[float],
+        def check_110_101(buyers: List[float], sellers1: List[float], sellers2: List[float],
                            expected_num_of_deals: int, expected_prices: List[float]):
             market = Market([
                 AgentCategory("buyer", buyers),
-                AgentCategory("seller", sellers),
-                AgentCategory("producer", producers),
-                AgentCategory("mover", movers),
+                AgentCategory("sellerA", sellers1),
+                AgentCategory("sellerB", sellers2)
             ])
-            # ps_recipes = [[1, 1, 0, 0], [1, 0, 1, 1]]
-            ps_recipe_struct = [0, [1, None, 2, [3, None]]]
+            # ps_recipes = [[1, 1, 0], [1, 0, 1]]
+            ps_recipe_struct = [0, [1, None, 2, None]]
             self._check_market(market, ps_recipe_struct, expected_num_of_deals, expected_prices)
 
-        check_1100_1011(buyers=[19, 17, 15, 13, 11, 9], sellers=[-12, -10, -8, -6, -4, -2], producers=[], movers=[],
-            expected_num_of_deals=4, expected_prices=[10.0, -10.0, None, None])
-        # show_log()
-        check_1100_1011(buyers=[19, 17, 15, 13, 11, 9], sellers=[], producers=[-6,-5,-4,-3,-2,-1], movers=[-6,-5,-4,-3,-2,-1],
-            expected_num_of_deals=4, expected_prices=[10, None, -5, -5])
-        # hide_log()
+        show_log()
+        check_110_101(buyers=[20,20,20,20], sellers1=[-10, -10], sellers2=[-10, -10],
+            expected_num_of_deals=3, expected_prices=[10.0, -10.0, None, None])
+        check_110_101(buyers=[20,20,20,20], sellers1=[-10, -15], sellers2=[-10, -10],
+            expected_num_of_deals=3, expected_prices=[15.0, -15.0, None, None])
+        hide_log()
 
 
     def test_market_11100_10011(self):
